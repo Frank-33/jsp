@@ -19,7 +19,7 @@
 </xq:execute>
 <table border="1" cellpadding="3" cellspacing="0">
 	<tr style="color:white;background-color:black;"><th>Index</th><th>Value</th><th>Node?</th></tr>
-	<c:forEach var="item" items="${result.sequence}" varStatus="status" >
+	<c:forEach var="item" items="${result.items}" varStatus="status" >
 		<tr>
 			<td><c:out value="${status.index + 1}"/></td>
 			<td><c:out value="${item.string}" escapeXml="false"/></td>

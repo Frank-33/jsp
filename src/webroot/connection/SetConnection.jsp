@@ -3,5 +3,6 @@
 
 <xq:unSetDataSource/>
 
-<c:set scope="page" var="redirdestination" value="/" />
-<jsp:forward page="ConnectionForm.jsp" />
+<jsp:forward page="ConnectionForm.jsp">
+	<jsp:param name="redirdestination" value="/"/>
+</jsp:forward>

@@ -1,12 +1,8 @@
-<%@ page language="java" %>
-<%@ taglib uri="http://marklogic.com/jsp/taglib" prefix="xq" %>
-<%@ taglib uri="http://sun.com/jstl/c" prefix="c" %>
-<%@ taglib uri="http://sun.com/jstl/x" prefix="x" %>
-<jsp:include page="/connection/CheckConnection.jsp"/>
+<%@include file="../common/CheckConnectionHeader.jsp" %>
 
 <html>
 <head>
-<title>Test QuickQuery 2</title>
+<title>Run XQuery, Iterate Over Result</title>
 </head>
 <body style="Font-family:arial,helvetica,san-serif;">
 <div align="center">
@@ -19,7 +15,7 @@
 </xq:execute>
 <table border="1" cellpadding="3" cellspacing="0">
 	<tr style="color:white;background-color:black;"><th>Index</th><th>Value</th><th>Node?</th></tr>
-	<c:forEach var="item" items="${result.sequence}" varStatus="status" >
+	<c:forEach var="item" items="${result.items}" varStatus="status" >
 		<tr>
 			<td><c:out value="${status.index + 1}"/></td>
 			<td><c:out value="${item.string}" escapeXml="false"/></td>
@@ -30,5 +26,9 @@
 		</tr>
 	</c:forEach>
 </table>
+
+<br>
+<br>
+<form action="/"><input type="submit" value="Go Home"></form>
 </div>
 </body>
