@@ -1,10 +1,11 @@
 /*
  * Copyright 2004 Mark Logic Corporation. All Rights Reserved.
  */
-package com.marklogic.jsptaglib.xquery.rt;
+package com.marklogic.jsptaglib.xquery.statement.rt;
 
 import com.marklogic.xdbc.XDBCException;
 import com.marklogic.jsptaglib.xquery.XdbcHelper;
+import com.marklogic.jsptaglib.xquery.rt.ResultTag;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyTagSupport;

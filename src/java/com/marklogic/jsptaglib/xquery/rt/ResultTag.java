@@ -6,6 +6,7 @@ package com.marklogic.jsptaglib.xquery.rt;
 import com.marklogic.jsptaglib.TagPropertyHelper;
 import com.marklogic.jsptaglib.AttributeHelper;
 import com.marklogic.jsptaglib.xquery.XdbcHelper;
+import com.marklogic.jsptaglib.xquery.common.ResultItemImpl;
 import com.marklogic.xdbc.XDBCException;
 import com.marklogic.xdbc.XDBCResultSequence;
 
@@ -39,7 +40,7 @@ public class ResultTag extends BodyTagSupport
 	// -----------------------------------------------------------
 
 	/**
-	 * @jsp:attribute required="false" rtexprvalue="true"
+	 * @jsp:attribute required="true" rtexprvalue="true"
 	 */
 	public void setVar (String var) throws JspException
 	{
@@ -172,7 +173,7 @@ public class ResultTag extends BodyTagSupport
 
 	public int doStartTag() throws JspException
 	{
-		if (TagSupport.findAncestorWithClass (this, ExecuteTag.class) != null) {
+		if (TagSupport.findAncestorWithClass (this, ExecuteTag.class) == null) {
 			throw new JspException ("result tag must be nested in an execute tag");
 		}
 
@@ -189,10 +190,12 @@ public class ResultTag extends BodyTagSupport
 			}
 
 			index = 0;
-			currentResultFetched = true;
-			stepToNextElement();
+//			currentResultFetched = false;		// FIXME
+//			stepToNextElement();
+
+			setItemVar (xdbcResultSequence, index);
 		} catch (XDBCException e) {
-			throw new JspException ("Executing query", e);
+			throw new JspException ("Executing query: " + e, e);
 		}
 
 		return EVAL_BODY_BUFFERED;
@@ -202,7 +205,11 @@ public class ResultTag extends BodyTagSupport
 	{
 		try {
 			if (xdbcResultSequence.hasNext()) {
-				stepToNextElement();
+//				stepToNextElement();
+
+				index++;
+				
+				setItemVar (xdbcResultSequence, index);
 				return EVAL_BODY_BUFFERED;
 			}
 		} catch (XDBCException e) {
@@ -243,12 +250,21 @@ public class ResultTag extends BodyTagSupport
 
 	// -----------------------------------------------------------
 
+	private void setItemVar (XDBCResultSequence xdbcResultSequence, int index)
+		throws XDBCException
+	{
+		xdbcResultSequence.next();
+
+		AttributeHelper.setScopedAttribute (pageContext, var,
+			new ResultItemImpl (xdbcResultSequence, index), scope);
+	}
+
 	private void validateResultIsNode ()
 		throws XDBCException
 	{
 		if (xdbcResultSequence.getItemType() != XDBCResultSequence.XDBC_Node) {
 			throw new XDBCException ("Result is not a Node (result type: "
-				+ getCurrentResultAsObject().getClass ().getName () + ")");
+				+ getCurrentResultAsObject().getClass().getName() + ")");
 		}
 	}
 

@@ -12,8 +12,8 @@ import javax.servlet.jsp.JspException;
 /**
  * @jsp:tag name="query" description="Query tag, Expression Language enabled"
  * @see com.marklogic.jsptaglib.xquery.rt.QueryTag
- * @see com.marklogic.jsptaglib.xquery.common.ResultSequence
  * @see com.marklogic.jsptaglib.xquery.common.Result
+ * @see com.marklogic.jsptaglib.xquery.common.ResultItem
  * @see com.marklogic.jsptaglib.xquery.statement.rt.StatementTag
  * @see com.marklogic.jsptaglib.xquery.statement.rt.ResultSequenceTag
  */

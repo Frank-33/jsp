@@ -6,7 +6,7 @@ package com.marklogic.jsptaglib.xquery.rt;
 import com.marklogic.jsptaglib.AttributeHelper;
 import com.marklogic.jsptaglib.TagPropertyHelper;
 import com.marklogic.jsptaglib.xquery.XdbcHelper;
-import com.marklogic.jsptaglib.xquery.common.ResultSequenceImpl;
+import com.marklogic.jsptaglib.xquery.common.ResultImpl;
 import com.marklogic.jsptaglib.xquery.common.StatementProperties;
 import com.marklogic.xdbc.XDBCConnection;
 import com.marklogic.xdbc.XDBCException;
@@ -26,14 +26,14 @@ import java.io.IOException;
  * defines the query value to execute by the following resultSequence
  * tag.  If used as a top-level tag, the query will be implictly executed
  * using the in-scope data source. If 'var' is provided, that attribute
- * will be set to and instance of ResultSequence which will contain the
- * result of the query.  Each ResultSequence contains zero or more Result
+ * will be set to and instance of Result which will contain the
+ * result of the query.  Each Result contains zero or more ResultItem
  * objects.  If var is not provided, the result sequence is concatenated
  * to form a string and replaces the query tag in the JSP page result.  If
  * the optional 'separator' attribute is specified, its string value is
  * written between each result."
- * @see com.marklogic.jsptaglib.xquery.common.ResultSequence
  * @see com.marklogic.jsptaglib.xquery.common.Result
+ * @see com.marklogic.jsptaglib.xquery.common.ResultItem
  * @see com.marklogic.jsptaglib.xquery.rt.ExecuteTag
  * @see com.marklogic.jsptaglib.xquery.rt.ResultTag
  */
@@ -135,26 +135,28 @@ public class QueryTag extends BodyTagSupport
 			return (EVAL_PAGE);
 		}
 
-		xdbcConnection = SetDataSourceTag.getConnection (pageContext, (XDMPDataSource) dataSource, true);
+		throw new JspException ("The query tag must be nested in an execute tag");
 
-		try {
-			XDBCStatement xdbcStatement = xdbcConnection.createStatement();
-			XDBCResultSequence xdbcResultSequence = xdbcStatement.executeQuery (getQueryString());
-
-			if (var == null) {
-				XdbcHelper.concatResult (xdbcResultSequence, pageContext.getOut(), separator);
-			} else {
-				AttributeHelper.setScopedAttribute (pageContext, var,
-					new ResultSequenceImpl (xdbcResultSequence), scope);
-			}
-
-		} catch (XDBCException e) {
-			throw new JspException ("XDBC error", e);
-		} catch (IOException e) {
-			throw new JspException ("I/O problem sending result", e);
-		}
-
-		return (EVAL_PAGE);
+//		xdbcConnection = SetDataSourceTag.getConnection (pageContext, (XDMPDataSource) dataSource, true);
+//
+//		try {
+//			XDBCStatement xdbcStatement = xdbcConnection.createStatement();
+//			XDBCResultSequence xdbcResultSequence = xdbcStatement.executeQuery (getQueryString());
+//
+//			if (var == null) {
+//				XdbcHelper.concatResult (xdbcResultSequence, pageContext.getOut(), separator);
+//			} else {
+//				AttributeHelper.setScopedAttribute (pageContext, var,
+//					new ResultImpl (xdbcResultSequence), scope);
+//			}
+//
+//		} catch (XDBCException e) {
+//			throw new JspException ("XDBC error", e);
+//		} catch (IOException e) {
+//			throw new JspException ("I/O problem sending result", e);
+//		}
+//
+//		return (EVAL_PAGE);
 	}
 
 	// ------------------------------------------------------------

@@ -4,7 +4,7 @@
 package com.marklogic.jsptaglib.xquery.rt;
 
 import com.marklogic.jsptaglib.xquery.common.StatementProperties;
-import com.marklogic.jsptaglib.xquery.common.ResultSequenceImpl;
+import com.marklogic.jsptaglib.xquery.common.ResultImpl;
 import com.marklogic.jsptaglib.xquery.XdbcHelper;
 import com.marklogic.jsptaglib.AttributeHelper;
 import com.marklogic.xdbc.XDBCConnection;
@@ -177,9 +177,9 @@ public class ExecuteTag extends BodyTagSupport
 	{
 		try {
 			AttributeHelper.setScopedAttribute (pageContext, var,
-				new ResultSequenceImpl (xdbcResultSequence), scope);
+				new ResultImpl (xdbcResultSequence), scope);
 		} catch (XDBCException e) {
-			throw new JspException ("creating Result object", e);
+			throw new JspException ("creating ResultItem object", e);
 		}
 	}
 

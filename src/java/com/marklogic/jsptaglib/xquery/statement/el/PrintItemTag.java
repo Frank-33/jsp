@@ -1,7 +1,7 @@
 /*
  * Copyright 2004 Mark Logic Corporation. All Rights Reserved.
  */
-package com.marklogic.jsptaglib.xquery.el;
+package com.marklogic.jsptaglib.xquery.statement.el;
 
 /**
  * @jsp:tag name="printItem" body-content="empty"

@@ -22,14 +22,4 @@ public class ResultTag extends com.marklogic.jsptaglib.xquery.rt.ResultTag
 	{
 		super.setScope ((String) ExpressionEvaluatorManager.evaluate ("scope", scope, String.class, this, pageContext));
 	}
-
-	public void setName (String name) throws JspException
-	{
-		super.setName ((String) ExpressionEvaluatorManager.evaluate ("name", name, String.class, this, pageContext));
-	}
-
-	public void setLoop (String loop) throws JspException
-	{
-		super.setLoop (((Boolean) ExpressionEvaluatorManager.evaluate ("loop", loop, Boolean.class, this, pageContext)).booleanValue());
-	}
 }

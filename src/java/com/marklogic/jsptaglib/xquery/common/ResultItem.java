@@ -5,12 +5,20 @@ package com.marklogic.jsptaglib.xquery.common;
 
 import com.marklogic.xdbc.XDBCException;
 
+import java.io.Reader;
+import java.io.IOException;
+
 /**
  * One of the result elements in a sequence returned by
  * the execution of an XQuery script.
  */
 public interface ResultItem
 {
+	/**
+	 * @return Index (zero-based) of this item in the result sequence.
+	 */
+	int getIndex();
+
 	/**
 	 * @return True if this result is an XML DOM node, otherwise false.
 	 */
@@ -48,6 +56,13 @@ public interface ResultItem
 	 * then this exception will always be thrown.
 	 */
 	org.jdom.Document getJDom() throws XDBCException;
+
+	/**
+	 * @return A Reader from which the String representation of this
+	 *  result item can be read.
+	 * @throws IOException If there is a problem setting up the reader.
+	 */
+	Reader getReader() throws IOException;
 
 	// FIXME: Need Numbers and dates?  Or are Strings enough?
 }
