@@ -14,7 +14,7 @@
 	Host: <input type="text" name="host"><br>
 	Port: <input type="text" name="port"><br>
 	User: <input type="text" name="user"><br>
-	Pass: <input type="text" name="pass"><br>
+	Pass: <input type="password" name="pass"><br>
 	<input type="hidden" name="posting" value="true">
 	<br>
 	<input type="submit" value="Set Connection DataSource">

@@ -24,11 +24,11 @@ import javax.servlet.jsp.JspException;
 
 
 /**
- * @jsp:tag name="param"
+ * @jsp:tag name="variable"
  *  description="Set named parameter for the query or module invocation"
  * @author Ron Hitchens (ron.hitchens@marklogic.com)
  */
-public class ParamTag extends com.marklogic.jsptaglib.xquery.rt.ParamTag
+public class VariableTag extends com.marklogic.jsptaglib.xquery.rt.VariableTag
 {
 	/**
 	 * @jsp:attribute required="false" rtexprvalue="false"

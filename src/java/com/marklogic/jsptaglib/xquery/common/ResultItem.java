@@ -18,8 +18,6 @@
  */
 package com.marklogic.jsptaglib.xquery.common;
 
-import com.marklogic.xdbc.XDBCException;
-
 import java.io.Reader;
 
 /**
@@ -58,19 +56,19 @@ public interface ResultItem
 
 	/**
 	 * @return This result as a W3C DOM (org.w3c.dom.Document) object.
-	 * @throws XDBCException If there is a problem converting this
+	 * @throws ResultException If there is a problem converting this
 	 * result to a DOM.  If this result is not a node (isNode() == false)
 	 * then this exception will always be thrown.
 	 */
-	org.w3c.dom.Document getW3cDom() throws XDBCException;
+	org.w3c.dom.Document getW3cDom() throws ResultException;
 
 	/**
 	 * @return This result as a JDOM DOM (org.jdom.Document) object.
-	 * @throws XDBCException If there is a problem converting this
+	 * @throws ResultException If there is a problem converting this
 	 * result to a DOM.  If this result is not a node (isNode() == false)
 	 * then this exception will always be thrown.
 	 */
-	org.jdom.Document getJDom() throws XDBCException;
+	org.jdom.Document getJDom() throws ResultException;
 
 	/**
 	 * @return A Reader from which the String representation of this

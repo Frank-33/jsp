@@ -55,6 +55,7 @@
 	<property name="xdmp.jar" value="${jarlib}/xdmp.jar"/>
 	<property name="jdom.jar" value="${jarlib}/jdom.jar"/>
 	<property name="apachejstl.jar" value="${jarlib}/standard.jar"/>
+	<property name="xqrunner.jar" value="${jarlib}/xqrunner.jar"/>
 
 	<!-- Intermediate generated files -->
 	<property name="bundle.staging.dir" value="${generated.files}/bundle"/>
@@ -115,6 +116,7 @@
 		<pathelement path="${xdmp.jar}"/>
 		<pathelement path="${jdom.jar}"/>
 		<pathelement path="${apachejstl.jar}"/>
+		<pathelement path="${xqrunner.jar}"/>
 		<pathelement path="${compiled.classes.dir}"/>
 	</path>
 
@@ -226,6 +228,7 @@
 				<include name="jdom.jar"/>
 				<include name="jstl.jar"/>
 				<include name="standard.jar"/>
+				<include name="xqrunner.jar"/>
 			</lib>
 		</war>
 	</target>

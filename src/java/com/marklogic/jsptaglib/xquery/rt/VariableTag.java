@@ -18,19 +18,15 @@
  */
 package com.marklogic.jsptaglib.xquery.rt;
 
-import com.marklogic.jsptaglib.TagPropertyHelper;
-import com.marklogic.jsptaglib.xquery.common.ConnectionProperties;
-
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyTagSupport;
-import javax.servlet.jsp.tagext.TagSupport;
 
 /**
- * @jsp:tag name="param"
+ * @jsp:tag name="variable"
  *  description="Set named parameter for the query or module invocation"
  * @author Ron Hitchens (ron.hitchens@marklogic.com)
  */
-public class ParamTag extends BodyTagSupport
+public class VariableTag extends BodyTagSupport
 {
 	private String namespace = null;
 	private String localname = null;

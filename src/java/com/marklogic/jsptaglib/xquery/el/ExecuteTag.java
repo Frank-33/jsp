@@ -18,7 +18,7 @@
  */
 package com.marklogic.jsptaglib.xquery.el;
 
-import com.marklogic.xdmp.XDMPDataSource;
+import com.marklogic.xqrunner.XQDataSource;
 
 import org.apache.taglibs.standard.lang.support.ExpressionEvaluatorManager;
 
@@ -76,6 +76,6 @@ public class ExecuteTag extends com.marklogic.jsptaglib.xquery.rt.ExecuteTag
 	 */
 	public void setDataSource (String dataSource) throws JspException
 	{
-		super.setDataSource ((XDMPDataSource) ExpressionEvaluatorManager.evaluate ("dataSource", dataSource, XDMPDataSource.class, this, pageContext));
+		super.setDataSource ((XQDataSource) ExpressionEvaluatorManager.evaluate ("dataSource", dataSource, XQDataSource.class, this, pageContext));
 	}
 }

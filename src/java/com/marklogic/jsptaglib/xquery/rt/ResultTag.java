@@ -20,8 +20,9 @@ package com.marklogic.jsptaglib.xquery.rt;
 
 import com.marklogic.jsptaglib.AttributeHelper;
 import com.marklogic.jsptaglib.TagPropertyHelper;
-import com.marklogic.xdbc.XDBCException;
-import com.marklogic.xdbc.XDBCResultSequence;
+import com.marklogic.jsptaglib.xquery.common.Result;
+import com.marklogic.xqrunner.XQException;
+import com.marklogic.xqrunner.XQResult;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyTagSupport;
@@ -29,7 +30,7 @@ import javax.servlet.jsp.tagext.TagSupport;
 import javax.servlet.jsp.tagext.TryCatchFinally;
 
 import java.io.IOException;
-import java.io.BufferedReader;
+import java.io.Reader;
 
 /**
  * @jsp:tag name="result" description="Invoked once per item in the result"
@@ -41,7 +42,7 @@ public class ResultTag extends BodyTagSupport implements TryCatchFinally
 	private String var = null;
 	private String scope = null;
 
-	private XDBCResultSequence xdbcResultSequence;
+	private Result result = null;
 	private int index = 0;
 	private boolean readerFetched = false;
 
@@ -51,7 +52,7 @@ public class ResultTag extends BodyTagSupport implements TryCatchFinally
 	{
 		var = null;
 		scope = null;
-		xdbcResultSequence = null;
+		result = null;
 		index = 0;
 		readerFetched = false;
 	}
@@ -74,7 +75,7 @@ public class ResultTag extends BodyTagSupport implements TryCatchFinally
 
 	// -----------------------------------------------------------
 
-	protected BufferedReader getCurrentReader() throws JspException, XDBCException
+	protected Reader getCurrentReader() throws JspException
 	{
 		if (var != null) {
 			throw new JspException ("Cannot stream if var attribute is set on result tag");
@@ -86,7 +87,7 @@ public class ResultTag extends BodyTagSupport implements TryCatchFinally
 
 		readerFetched = true;
 
-		return (xdbcResultSequence.nextReader());
+		return result.getItem (index).getReader();
 	}
 
 	// -----------------------------------------------------------
@@ -104,16 +105,18 @@ public class ResultTag extends BodyTagSupport implements TryCatchFinally
 		try {
 			ExecuteTag executeTag = (ExecuteTag) findAncestorWithClass (this, ExecuteTag.class);
 
-			xdbcResultSequence = executeTag.executeQuery();
+			XQResult xqResult = executeTag.executeQuery();
 
-			if (xdbcResultSequence.hasNext() == false) {
+			if (xqResult.getSize () == 0) {
 				return SKIP_BODY;
 			}
 
+			result = new ResultAdapter (xqResult);
+
 			index = 0;
 
-			setupNextItem (xdbcResultSequence, index);
-		} catch (XDBCException e) {
+			setupNextItem (result, index);
+		} catch (XQException e) {
 			throw new JspException ("Executing query: " + e, e);
 		}
 
@@ -122,15 +125,12 @@ public class ResultTag extends BodyTagSupport implements TryCatchFinally
 
 	public int doAfterBody() throws JspException
 	{
-		try {
-			if (xdbcResultSequence.hasNext()) {
-				index++;
-				setupNextItem (xdbcResultSequence, index);
+		index++;
 
-				return EVAL_BODY_BUFFERED;
-			}
-		} catch (XDBCException e) {
-			throw new JspException ("Iterating ResultSequenceTag, index=" + index + ": " + e, e);
+		if (index < result.getSize()) {
+			setupNextItem (result, index);
+
+			return EVAL_BODY_BUFFERED;
 		}
 
 		return EVAL_PAGE;
@@ -148,12 +148,6 @@ public class ResultTag extends BodyTagSupport implements TryCatchFinally
 			}
 		} catch (IOException e) {
 			throw new JspException ("Writing end-tag result: " + e, e);
-		} finally {
-			try {
-				xdbcResultSequence.close();
-			} catch (XDBCException e) {
-				e.printStackTrace();
-			}
 		}
 
 		TagPropertyHelper.assignAncestorProperty (this, ExecuteTag.class, "queryExecuted", true);
@@ -167,20 +161,13 @@ public class ResultTag extends BodyTagSupport implements TryCatchFinally
 
 	// -----------------------------------------------------------
 
-	private void setupNextItem (XDBCResultSequence xdbcResultSequence, int index)
-		throws XDBCException
+	private void setupNextItem (Result result, int index)
 	{
 		if (var == null) {
-			if ((readerFetched == false) && (index != 0)) {
-				xdbcResultSequence.next();
-			}
-
 			readerFetched = false;
 		} else {
-			xdbcResultSequence.next();
-
 			AttributeHelper.setScopedAttribute (pageContext, var,
-				new ResultItemImpl (xdbcResultSequence, index), scope);
+				result.getItem (index), scope);
 		}
 	}
 
@@ -193,12 +180,6 @@ public class ResultTag extends BodyTagSupport implements TryCatchFinally
 
 	public void doFinally ()
 	{
-		if (xdbcResultSequence != null) {
-			try {
-				xdbcResultSequence.close();
-			} catch (XDBCException e) {
-				// nothing
-			}
-		}
+		release();
 	}
 }

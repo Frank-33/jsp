@@ -1,4 +1,4 @@
-<%@include file="/common/CheckConnectionHeader.jsp" %>
+<%@include file="../common/CheckConnectionHeader.jsp" %>
 
 <c:if test="${param.posting == true}">
 	<c:catch var="xqexception">

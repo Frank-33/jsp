@@ -19,17 +19,15 @@
 package com.marklogic.jsptaglib.xquery.rt;
 
 import com.marklogic.jsptaglib.AttributeHelper;
-import com.marklogic.jsptaglib.xquery.XdmpDataSourceWrapper;
 import com.marklogic.jsptaglib.xquery.common.ConnectionProperties;
-import com.marklogic.xdbc.XDBCConnection;
-import com.marklogic.xdbc.XDBCException;
-import com.marklogic.xdmp.XDMPDataSource;
+import com.marklogic.xqrunner.XQDataSource;
+import com.marklogic.xqrunner.XQException;
+import com.marklogic.xqrunner.XQFactory;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspTagException;
-import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 
 import java.io.IOException;
@@ -150,28 +148,30 @@ import java.io.IOException;
 
 	public int doEndTag () throws JspException
 	{
-		XDMPDataSource xdmpDataSource = null;
+		XQDataSource xqDataSource = null;
 
 		if (dataSource != null) {
-			if (dataSource instanceof XDMPDataSource) {
-				xdmpDataSource = (XDMPDataSource) dataSource;
+			if (dataSource instanceof XQDataSource) {
+				xqDataSource = (XQDataSource) dataSource;
 			}
 
 			if (dataSource instanceof String) {
-					xdmpDataSource = getJndiDataSource ((String) dataSource);
+				xqDataSource = getJndiDataSource ((String) dataSource);
 			}
 		}
 
-		if (xdmpDataSource == null) {
+		if (xqDataSource == null) {
 			try {
-				xdmpDataSource = new XdmpDataSourceWrapper (host, port, user, password);
-			} catch (XDBCException e) {
+				XQFactory factory = new XQFactory();
+
+				xqDataSource = factory.newDataSource (host, port, user, password);
+			} catch (XQException e) {
 				throw new JspTagException ("Could not create DataSource for " + host
 					+ ":" + port + "/" + user);
 			}
 		}
 
-		AttributeHelper.setScopedAttribute (pageContext, var, xdmpDataSource, scope);
+		AttributeHelper.setScopedAttribute (pageContext, var, xqDataSource, scope);
 
 		release();
 
@@ -181,7 +181,7 @@ import java.io.IOException;
 	// ------------------------------------------------------------------
 
 
-	private XDMPDataSource getJndiDataSource (String jndiName)
+	private XQDataSource getJndiDataSource (String jndiName)
 		throws JspException
 	{
 		InitialContext jndiContext = null;
@@ -193,40 +193,17 @@ import java.io.IOException;
 		}
 
 		try {
-			return ((XDMPDataSource) jndiContext.lookup (jndiName));
+			return ((XQDataSource) jndiContext.lookup (jndiName));
 		} catch (NamingException e) {
 			// nothing
 		}
 
 		try {
-			return ((XDMPDataSource) jndiContext.lookup ("java:comp/env/" + jndiName));
+			return ((XQDataSource) jndiContext.lookup ("java:comp/env/" + jndiName));
 		} catch (NamingException ex) {
 			// nothing
 		}
 
 		throw new JspTagException ("Cannot locate JNDI DataSource: " + jndiName);
-	}
-
-	// ------------------------------------------------------------------
-
-	public static XDBCConnection getConnection (PageContext pageContext,
-		XDMPDataSource dataSourceParam, boolean throwIfNone)
-		throws JspException
-	{
-		XDMPDataSource dataSource = dataSourceParam;
-
-		if (dataSource == null) {
-			dataSource = (XDMPDataSource) pageContext.findAttribute (ML_DEFAULT_DATASOURCE_VAR);
-		}
-
-		if ((dataSource == null) && (throwIfNone)) {
-			throw new JspTagException ("Cannot find a DataSource in scope");
-		}
-
-		try {
-			return (dataSource.getConnection());
-		} catch (XDBCException e) {
-			throw new JspException ("Cannot get connection from DataSource", e);
-		}
 	}
 }

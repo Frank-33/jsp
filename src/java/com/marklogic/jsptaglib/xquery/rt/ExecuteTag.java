@@ -18,13 +18,14 @@
  */
 package com.marklogic.jsptaglib.xquery.rt;
 
-import com.marklogic.jsptaglib.xquery.XdbcHelper;
 import com.marklogic.jsptaglib.AttributeHelper;
-import com.marklogic.xdbc.XDBCConnection;
-import com.marklogic.xdbc.XDBCException;
-import com.marklogic.xdbc.XDBCResultSequence;
-import com.marklogic.xdbc.XDBCStatement;
-import com.marklogic.xdmp.XDMPDataSource;
+import com.marklogic.xqrunner.XQDataSource;
+import com.marklogic.xqrunner.XQException;
+import com.marklogic.xqrunner.XQResult;
+import com.marklogic.xqrunner.XQRunner;
+import com.marklogic.xqrunner.XQuery;
+import com.marklogic.xqrunner.XQVariable;
+import com.marklogic.xqrunner.XQVariableType;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspTagException;
@@ -34,6 +35,7 @@ import javax.servlet.jsp.tagext.TryCatchFinally;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Iterator;
 
 /**
  * @jsp:tag name="execute" description="Execution context for query"
@@ -48,13 +50,10 @@ public class ExecuteTag extends BodyTagSupport
 	private String query = null;
 	private String module = null;
 	private String separator = null;
-	private XDMPDataSource dataSource = null;
+	private XQDataSource dataSource = null;
 
 	private boolean queryExecuted = false;
-
-	private XDBCStatement xdbcStatement = null;
-	private XDBCConnection xdbcConnection = null;
-	private List params = new ArrayList();
+	private List vars = new ArrayList();
 
 	// -------------------------------------------------------------
 
@@ -67,8 +66,7 @@ public class ExecuteTag extends BodyTagSupport
 		separator = null;
 		dataSource = null;
 		queryExecuted = false;
-		xdbcStatement = null;
-		xdbcConnection = null;
+		vars.clear();
 	}
 
 	/**
@@ -114,7 +112,7 @@ public class ExecuteTag extends BodyTagSupport
 	/**
 	 * @jsp:attribute required="false" rtexprvalue="true"
 	 */
-	public void setDataSource (XDMPDataSource dataSource)
+	public void setDataSource (XQDataSource dataSource)
 	{
 		this.dataSource = dataSource;
 	}
@@ -130,34 +128,41 @@ public class ExecuteTag extends BodyTagSupport
 	protected void addParam (String namespace, String localname, String type, String value)
 		throws JspException
 	{
-		params.add (new Param (namespace, localname, type, value));
+		vars.add (new Var (namespace, localname, type, value));
 
 		// TODO: remove this when parameter handling is fully implemented
-		throw new JspException ("parameter handling is not yet implemented");
+//		throw new JspException ("parameter handling is not yet implemented");
 	}
 
 	// ------------------------------------------------------------------------
 
-	public XDBCResultSequence executeQuery ()
-		throws XDBCException
+	public XQResult executeQuery ()
+		throws XQException
 	{
-		return (xdbcStatement.executeQuery (query));
+		// TODO: Handle "module" attribute being set instead of "query"
+
+		XQuery xquery = dataSource.newQuery (query);
+
+		for (Iterator it = vars.iterator (); it.hasNext ();) {
+			Var var = (Var) it.next();
+
+			xquery.setVariable (var.asXQVariable (dataSource));
+		}
+
+		XQRunner runner = dataSource.newSyncRunner();
+
+		return (runner.runQuery (xquery));
 	}
 
 	// ------------------------------------------------------------------------
 
 	public int doStartTag() throws JspException
 	{
-		if ((dataSource != null) && ( ! (dataSource instanceof XDMPDataSource))) {
-			throw new JspTagException ("DataSource must be an instance of XDMPDataSource");
+		if ((dataSource != null) && ( ! (dataSource instanceof XQDataSource))) {
+			throw new JspTagException ("DataSource must be an instance of XQDataSource");
 		}
 
-		try {
-			xdbcConnection = SetDataSourceTag.getConnection (pageContext, (XDMPDataSource) dataSource, true);
-			xdbcStatement = xdbcConnection.createStatement();
-		} catch (XDBCException e) {
-			throw new JspException ("Cannot create XDBCStatement: " + e, e);
-		}
+		dataSource = getDataSource (dataSource);
 
 		return EVAL_BODY_INCLUDE;
 	}
@@ -196,17 +201,15 @@ public class ExecuteTag extends BodyTagSupport
 		}
 
 		try {
-			// TODO: Handle "module" attribute being set instead of "query"
-			// TODO: Handle setting parameters
 
-			XDBCResultSequence xdbcResultSequence = xdbcStatement.executeQuery (query);
+			XQResult result = executeQuery();
 
 			if (var == null) {
-				outputResult (xdbcResultSequence, separator);
+				outputResult (result, separator);
 			} else {
-				setResult (xdbcResultSequence, var);
+				setResult (result, var);
 			}
-		} catch (XDBCException e) {
+		} catch (XQException e) {
 			throw new JspException ("executing query: " + e, e);
 		}
 
@@ -217,24 +220,18 @@ public class ExecuteTag extends BodyTagSupport
 
 	// ------------------------------------------------------------------------
 
-	private void setResult (XDBCResultSequence xdbcResultSequence, String var)
-		throws JspException
+	private void setResult (XQResult result, String var)
 	{
-		try {
-			AttributeHelper.setScopedAttribute (pageContext, var,
-				new ResultImpl (xdbcResultSequence), scope);
-		} catch (XDBCException e) {
-			throw new JspException ("creating ResultItem object: " + e, e);
-		}
+		AttributeHelper.setScopedAttribute (pageContext, var,
+			new ResultAdapter (result), scope);
 	}
 
-	private void outputResult (XDBCResultSequence xdbcResultSequence, String separator)
+	private void outputResult (XQResult result, String separator)
 		throws JspException
 	{
 		try {
-			XdbcHelper.concatResult (xdbcResultSequence, pageContext.getOut(), separator);
-		} catch (XDBCException e) {
-			throw new JspException ("processing result: " + e, e);
+			// FIXME: make this streaming: result.writeTo (Writer writer)
+			pageContext.getOut().write (result.asString (separator));
 		} catch (IOException e) {
 			throw new JspException ("writing result: " + e, e);
 		}
@@ -249,38 +246,50 @@ public class ExecuteTag extends BodyTagSupport
 
 	public void doFinally ()
 	{
-		try {
-			if (xdbcStatement != null) {
-				xdbcStatement.close();
-				xdbcStatement = null;
-			}
-
-			if (xdbcConnection != null) {
-				xdbcConnection.close();
-				xdbcConnection = null;
-			}
-		} catch (XDBCException e) {
-			// nothing, ignore it
-		}
-
 		release();
 	}
 
 	// ------------------------------------------------------------------------
 
-	private class Param
+	public XQDataSource getDataSource (XQDataSource dataSourceParam)
+		throws JspException
+	{
+		XQDataSource dataSource = dataSourceParam;
+
+		if (dataSource == null) {
+			dataSource = (XQDataSource) pageContext.findAttribute (SetDataSourceTag.ML_DEFAULT_DATASOURCE_VAR);
+		}
+
+		if (dataSource == null) {
+			throw new JspTagException ("Cannot find a DataSource in scope");
+		}
+
+		return (dataSource);
+	}
+
+	// ------------------------------------------------------------------------
+
+	private class Var
 	{
 		private String namespace;
 		private String localname;
-		private String type;
 		private String value;
+		private XQVariableType type;
 
-		public Param (String namespace, String localname, String type, String value)
+		public Var (String namespace, String localname, String type, String value)
+			throws JspException
 		{
 			this.namespace = namespace;
 			this.localname = localname;
-			this.type = type;
 			this.value = value;
+			this.type = (type == null) ? XQVariableType.XS_UNTYPED_ATOMIC : XQVariableType.forType (type);
+
+			if (this.type == null) {
+				throw new JspException ("Invalid schema type given for variable: " +
+					"namespace=" + namespace +
+					", localname=" + localname +
+					", type=" + type);
+			}
 		}
 
 		public String getNamespace ()
@@ -293,7 +302,7 @@ public class ExecuteTag extends BodyTagSupport
 			return localname;
 		}
 
-		public String getType ()
+		public XQVariableType getType()
 		{
 			return type;
 		}
@@ -301,6 +310,21 @@ public class ExecuteTag extends BodyTagSupport
 		public String getValue ()
 		{
 			return value;
+		}
+
+		public XQVariable asXQVariable (XQDataSource dataSource) throws XQException
+		{
+			if (type == XQVariableType.XS_STRING) {
+				return (dataSource.newVariable (namespace,
+					localname, type, value));
+			}
+
+			if (type == XQVariableType.XS_INTEGER) {
+				return (dataSource.newVariable (namespace,
+					localname, type, Integer.parseInt (value)));
+			}
+
+			throw new XQException ("FIXME: not fully implemented");
 		}
 	}
 }

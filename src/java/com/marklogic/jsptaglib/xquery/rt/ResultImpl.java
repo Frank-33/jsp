@@ -18,10 +18,11 @@
  */
 package com.marklogic.jsptaglib.xquery.rt;
 
+import com.marklogic.jsptaglib.xquery.common.Result;
+import com.marklogic.jsptaglib.xquery.common.ResultException;
+import com.marklogic.jsptaglib.xquery.common.ResultItem;
 import com.marklogic.xdbc.XDBCException;
 import com.marklogic.xdbc.XDBCResultSequence;
-import com.marklogic.jsptaglib.xquery.common.Result;
-import com.marklogic.jsptaglib.xquery.common.ResultItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,7 @@ import java.util.List;
  * Implementation of the Result interface which holds the
  * buffered result of an XQuery execution.
  * @author Ron Hitchens (ron.hitchens@marklogic.com)
+ * @deprecated No longer needed, functionality is in XQRunner library
  */
 public class ResultImpl implements Result
 {
@@ -40,7 +42,7 @@ public class ResultImpl implements Result
 	 * @param xdbcResultSequence The object to obtain the data from.
 	 * @throws XDBCException If there is a problem reading the data.
 	 */
-	public ResultImpl (XDBCResultSequence xdbcResultSequence) throws XDBCException
+	public ResultImpl (XDBCResultSequence xdbcResultSequence) throws ResultException, XDBCException
 	{
 		List list = new ArrayList();
 		int index = 0;

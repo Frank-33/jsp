@@ -32,10 +32,10 @@ xq:setDataSource
 		password	password for user
 	nestable tags
 		xq:host		body is host name, or use initParameter attribute
-		xq:port		body is port number, use or initParameter attribute
-		xq:user		body is user name, use or initParameter attribute
-		xq:password	body is password, use or initParameter attribute
-		xq:dataSource	body is JNDI key, use or initParameter attribute
+		xq:port		body is port number, or use initParameter attribute
+		xq:user		body is user name, or use initParameter attribute
+		xq:password	body is password, or use initParameter attribute
+		xq:dataSource	body is JNDI key, or use initParameter attribute
 
 xq:unSetDataSource
 	attributes
@@ -54,18 +54,20 @@ xq:execute
 				the result is to be written out (var not given)
 	nestable tags
 		xq:query	body is arbitrary XQuery code to send
-		xq:param	body is parameter value, attrs are namespace/localname/type
+		xq:variable	body is variable value, attrs are namespace/localname/type
 		xq:result	body evaluated for each result item
 
 xq:query
 	no attributes, body is arbitrary XQuery code
 
-xq:param
+xq:variable
 	attributes
 		namespace	namespace URI (default = empty string namespace)
 		localname	local name of variable to create
-		type		type of variable (default untyped atomic)
+		type		type of variable (default xs:untypedAtomic)
 				(XML Schema types, without namespace prefix)
+		value		variable value as a string
+
 xq:result
 	attributes
 		var		container variable to set current result Item to
@@ -134,7 +136,7 @@ Body of xq:result runs once for each result in the sequence
 		return ...
 	</xq:query>
 
-	<xq:param namespace="nsURI" name="localname" type="XML Schema types no prefix">foo</xq:param>
+	<xq:variable namespace="nsURI" name="localname" type="XML Schema types no prefix">foo</xq:variable>
 
 	<!-- May not be present if xq:execute@var is given -->
 	<xq:result var="var-to-set-item-to" scope="scope-of-var-attr">
@@ -155,7 +157,7 @@ Body of xq:result runs once for each result in the sequence
 		return ...
 	</xq:query>
 
-	<xq:param namespace="nsURI" name="localname" type="XML Schema types no prefix">foo</xq:param>
+	<xq:variable namespace="nsURI" name="localname" type="XML Schema types no prefix">foo</xq:variable>
 
 	<!-- xq:streamItem tag may not be used if xq:result@var is given -->
 	<xq:result>
@@ -193,7 +195,7 @@ Same as above, naming a module
 Same as above, with parameters
 
 <xq:execute module="module-name">
-	<xq:param namespace="nsURI" name="localname" type="XML Schema types no prefix">foo</xq:param>
+	<xq:variable namespace="nsURI" name="localname" type="XML Schema types no prefix">foo</xq:variable>
 </xq:execute>
 
 
@@ -220,7 +222,7 @@ and no longer has any relationship to the XDBC call.
 <xq:execute var="attr-to-receive-result" query="..."/>
 
 Run a query, set result (Result instance) in "var".
-Query specified in nested xq:query tag, with optional xq:param tags
+Query specified in nested xq:query tag, with optional xq:variable tags
 
 <xq:execute var="result">
 	<xq:query>
@@ -228,7 +230,7 @@ Query specified in nested xq:query tag, with optional xq:param tags
 	</xq:query>
 
 	<!-- default type = untyped atomic, default ns = empty string ns -->
-	<xq:param namespace="nsURI" localname="name" type="some-data-type-name">value</xq:param>
+	<xq:variable namespace="nsURI" localname="name" type="some-data-type-name">value</xq:variable>
 </xq:execute>
 
 

@@ -1,6 +1,6 @@
 <%@ taglib uri="http://marklogic.com/jsp/taglib" prefix="xq" %>
 
-<xq:setDataSource host="localhost" port="8003"/>
+<xq:setDataSource host="localhost" port="8003" user="test" password="test"/>
 
 <html><head><title>xq:query example 2</title></head>
 <body>

@@ -19,7 +19,6 @@
 package com.marklogic.jsptaglib.xquery.rt;
 
 import com.marklogic.jsptaglib.xquery.XdbcHelper;
-import com.marklogic.xdbc.XDBCException;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyTagSupport;
@@ -71,8 +70,6 @@ public class StreamItemTag extends BodyTagSupport
 			XdbcHelper.passThroughChars (reader, pageContext.getOut(), bufferSize);
 
 			reader.close();
-		} catch (XDBCException e) {
-			throw new JspException ("Getting stream reader: " + e, e);
 		} catch (IOException e) {
 			throw new JspException ("Writing output: " + e, e);
 		}

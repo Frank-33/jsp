@@ -2,6 +2,7 @@ package com.marklogic.jsptaglib.xquery.rt;
 
 import com.marklogic.jsptaglib.xquery.XdbcHelper;
 import com.marklogic.jsptaglib.xquery.common.ResultItem;
+import com.marklogic.jsptaglib.xquery.common.ResultException;
 import com.marklogic.xdbc.XDBCException;
 import com.marklogic.xdbc.XDBCResultSequence;
 import com.marklogic.xdbc.XDBCSchemaTypes;
@@ -20,6 +21,7 @@ import java.io.StringReader;
 /**
  * Implementation of the ResultItem interface.
  * @author Ron Hitchens (ron.hitchens@marklogic.com)
+ * @deprecated No longer needed, functionality is in XQRunner library
  */
 public class ResultItemImpl implements ResultItem
 {
@@ -36,10 +38,10 @@ public class ResultItemImpl implements ResultItem
 	 * Reads and stores the current item from the given ResultSequence.
 	 * @param xdbcResultSequence The source of the data.
 	 * @param index The logical index of this item, relative to others in the sequence.
-	 * @throws XDBCException If there is a problem obtaining the data.
+	 * @throws ResultException If there is a problem obtaining the data.
 	 */
 	public ResultItemImpl (XDBCResultSequence xdbcResultSequence, int index)
-		throws XDBCException
+		throws ResultException
 	{
 		this.index = index;
 
@@ -48,7 +50,11 @@ public class ResultItemImpl implements ResultItem
 			object = node;
 			string = node.asString();
 		} else {
-			object = XdbcHelper.resultAsObject (xdbcResultSequence);
+			try {
+				object = XdbcHelper.resultAsObject (xdbcResultSequence);
+			} catch (XDBCException e) {
+				throw new ResultException (e.getMessage(), e);
+			}
 		}
 	}
 
@@ -88,10 +94,11 @@ public class ResultItemImpl implements ResultItem
 
 	/**
 	 * @return This result item as a W3C DOM tree.
-	 * @throws XDBCException If there is a problem converting this
+	 * @throws ResultException If there is a problem converting this
 	 *  item to a DOM, or if this item is not a Node.
 	 */
-	public org.w3c.dom.Document getW3cDom() throws XDBCException
+	public org.w3c.dom.Document getW3cDom()
+		throws ResultException
 	{
 		if (w3cDom == null) {
 			w3cDom = asW3cDom (getString());
@@ -102,11 +109,11 @@ public class ResultItemImpl implements ResultItem
 
 	/**
 	 * @return This result item as a JDom tree.
-	 * @throws XDBCException If there is a problem converting this
+	 * @throws ResultException If there is a problem converting this
 	 *  item to a DOM, or if this item is not a Node.
 	 */
 	public org.jdom.Document getJDom()
-		throws XDBCException
+		throws ResultException
 	{
 		if (jdom == null) {
 			jdom = asJDom (getString());
@@ -127,26 +134,26 @@ public class ResultItemImpl implements ResultItem
 	// -------------------------------------------------------
 
 	private org.jdom.Document asJDom (String string)
-		throws XDBCException
+		throws ResultException
 	{
 		if (isNode() == false) {
-			throw new XDBCException ("Result is not a node");
+			throw new ResultException ("Result is not a node");
 		}
 
 		try {
 			return (new SAXBuilder().build (new StringReader (string)));
 		} catch (JDOMException e) {
-			throw new XDBCException ("Problem during JDOM build", e);
+			throw new ResultException ("Problem during JDOM build", e);
 		} catch (IOException e) {
-			throw new XDBCException ("IO problem during JDOM build", e);
+			throw new ResultException ("IO problem during JDOM build", e);
 		}
 	}
 
 	private org.w3c.dom.Document asW3cDom (String string)
-		throws XDBCException
+		throws ResultException
 	{
 		if (isNode() == false) {
-			throw new XDBCException ("Result is not a node");
+			throw new ResultException ("Result is not a node");
 		}
 
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance ();
@@ -154,9 +161,9 @@ public class ResultItemImpl implements ResultItem
 		try {
 			return (factory.newDocumentBuilder().parse (new InputSource (new StringReader (string))));
 		} catch (SAXException e) {
-			throw new XDBCException ("SAX Exception parsing result", e);
+			throw new ResultException ("SAX Exception parsing result", e);
 		} catch (Exception e) {
-			throw new XDBCException ("Exception building W3C DOM", e);
+			throw new ResultException ("Exception building W3C DOM", e);
 		}
 	}
 }

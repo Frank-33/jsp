@@ -24,6 +24,7 @@ CIS instance is.
 	<table align="center" border="0" cellpadding="0">
 		<tr><th colspan="2">Run Queries</th><tr>
 		<tr><td><a href="queries/TestQuery.jsp">Tabular Query Example</td><td width="1%">Source</a></td></tr>
+		<tr><td><a href="queries/Variables.jsp">Parameterized Example</td><td width="1%">Source</a></td></tr>
 		<tr><td><a href="queries/RunXQuery.jsp">Submit Ad-Hoc Queries to CIS</td><td width="1%">Source</a></td></tr>
 	</table>
 
