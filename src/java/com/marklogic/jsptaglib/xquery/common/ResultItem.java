@@ -9,7 +9,7 @@ import com.marklogic.xdbc.XDBCException;
  * One of the result elements in a sequence returned by
  * the execution of an XQuery script.
  */
-public interface Result
+public interface ResultItem
 {
 	/**
 	 * @return True if this result is an XML DOM node, otherwise false.

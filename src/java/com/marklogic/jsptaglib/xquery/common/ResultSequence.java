@@ -16,19 +16,19 @@ package com.marklogic.jsptaglib.xquery.common;
 public interface ResultSequence
 {
 	/**
-	 * @return The number of Result elements the sequence.
+	 * @return The number of ResultItem elements the sequence.
 	 */
 	int getSize();
 
 	/**
 	 * @return The full sequence of results as an array.
 	 */
-	Result [] getSequence();
+	ResultItem [] getSequence();
 
 	/**
-	 * @param index The index of the Result object to return, the first
+	 * @param index The index of the ResultItem object to return, the first
 	 * is zero.
-	 * @return The Result object at the requested index.
+	 * @return The ResultItem object at the requested index.
 	 */
-	Result getResult (int index);
+	ResultItem getResult (int index);
 }

@@ -23,7 +23,7 @@ import java.util.List;
 
 public class ResultSequenceImpl implements ResultSequence
 {
-	Result [] sequence;
+	ResultItem [] sequence;
 
 	public ResultSequenceImpl (XDBCResultSequence xdbcResultSequence) throws XDBCException
 	{
@@ -35,7 +35,7 @@ public class ResultSequenceImpl implements ResultSequence
 			list.add (new ResultImpl (xdbcResultSequence));
 		}
 
-		sequence = new Result [list.size()];
+		sequence = new ResultItem [list.size()];
 
 		list.toArray (sequence);
  	}
@@ -45,19 +45,19 @@ public class ResultSequenceImpl implements ResultSequence
 		return (sequence.length);
 	}
 
-	public Result [] getSequence ()
+	public ResultItem [] getSequence ()
 	{
 		return (sequence);
 	}
 
-	public Result getResult (int index)
+	public ResultItem getResult (int index)
 	{
 		return (sequence [index]);
 	}
 
 	// ------------------------------------------------------------
 
-	public static class ResultImpl implements Result
+	public static class ResultImpl implements ResultItem
 	{
 		private XDBCSchemaTypes.Node node;
 		private Object object;
