@@ -1,5 +1,6 @@
 <%@ page language="java" %>
-<%@ taglib uri="http://marklogic.com/jsp/taglib-rt" prefix="xq" %>
+<%@ taglib uri="http://marklogic.com/jsp/taglib" prefix="xq" %>
+<%@ taglib uri="http://sun.com/jstl/c" prefix="c" %>
 
 <html>
 <head>
@@ -8,13 +9,9 @@
 <body style="Font-family:arial,helvetica,san-serif;">
 <div align="center">
 
-<%--<xq:setDataSource>--%>
-<%--	<xq:host>ronsoft.net</xq:host>--%>
-<%--	<xq:port>8003</xq:port>--%>
-<%--</xq:setDataSource>--%>
 <xq:setDataSource host="ronsoft.net" port="8003"/>
 
-<xq:statement var="xqstmt">
+<xq:execute>
 	<xq:query>
 		<b>This is an xquery body</b>, <i>And this is another</i>,
 		<b>And this is number 3</b>, 4, <b>This is five</b>, <i>This is six</i>,
@@ -22,16 +19,22 @@
 	</xq:query>
 	ResultSequence for Query<br/><br/>
 	<table border="1" cellpadding="3" cellspacing="0">
-	<tr style="color:white;background-color:black;"><th>Index</th><th>Value</th><th>Node?</th></tr>
-	<xq:resultSequence var="xqrs">
+	<tr style="color:white;background-color:black;"><th>Position</th><th>Value</th><th>Node?</th></tr>
+	<xq:result var="item">
 		<tr>
-			<td align="right"><xq:getIndex/></td>
-			<td><xq:print/></td>
-			<td align="center"><xq:isNode>Yes</xq:isNode><xq:isNotNode>No</xq:isNotNode></td>
+			<td align="right"><c:out value="${item.index + 1}"/></td>
+<!--
+			<td>(xq:streamItem bufferSize="237" /></td>
+-->
+			<td><c:out value="${item.string}" escapeXml="false" /></td>
+			<td align="center">
+				<c:if test="${item.node == true}">Yes</c:if>
+				<c:if test="${item.node == false}">No</c:if>
+			</td>
 		</tr>
-	</xq:resultSequence>
+	</xq:result>
 	</table>
-</xq:statement>
+</xq:execute>
 
 </div>
 </body>

@@ -14,11 +14,11 @@ xq:setDataSource
 		user		name of user on server
 		password	password for user
 	nestable tags
-		xq:host		body is host name
-		xq:port		body is port number
-		xq:user		body is user name
-		xq:password	body is password
-		xq:dataSource	body is JNDI key
+		xq:host		body is host name, or use initParameter attribute
+		xq:port		body is port number, use or initParameter attribute
+		xq:user		body is user name, use or initParameter attribute
+		xq:password	body is password, use or initParameter attribute
+		xq:dataSource	body is JNDI key, use or initParameter attribute
 
 xq:unSetDataSource
 	attributes
@@ -54,19 +54,132 @@ xq:result
 		var		container variable to set current result Item to
 		scope		scope of var: page|request|session|application
 	nestable tags
-		xq:printItem	stringifies item and writes it to output
-				(can this be eliminated?  Check JSTL)
+		xq:streamItem	stringifies item and writes it to output
 
-xq:printItem
+xq:streamItem
+	attributes
+		bufferSize	Size of intermediate buffer to use for read/write loop
 
 
 Tag Usage Examples
 ------------------
 
+# General form, using xq:result tag and buffered items
+# Body of xq:resultSequence runs once for each result in the sequence
+<xq:execute dataSource="datasurce">
+	<xq:query>
+		for ...
+		let ...
+		return ...
+	</xq:query>
+
+	<xq:param namespace="nsURI" name="localname" type="XML Schema types no prefix">foo</xq:param>
+
+	<!-- May not be present if xq:execute@var is given -->
+	<xq:result var="var-to-set-item-to" scope="scope-of-var-attr">
+		<!-- JSTL or other tags can access buffered value of current
+		     result item by the name given in "var" attribute -->
+	</xq:result>
+</xq:execute>
+
+# Explicit streaming using xq:result tag.  xq:streamItem may not be
+# used if xq:result@var is given.
+# Body of xq:resultSequence runs once for each result in the sequence
+<xq:execute dataSource="foo">
+	<xq:query>
+		for ...
+		let ...
+		return ...
+	</xq:query>
+
+	<xq:param namespace="nsURI" name="localname" type="XML Schema types no prefix">foo</xq:param>
+
+	<!-- xq:streamItem tag may not be used if xq:result@var is given -->
+	<xq:result>
+		<xq:streamItem bufferSize="10000"/>
+	</xq:result>
+</xq:execute>
+
+
+# Run a query, stream result to output, replacing tag
+# Query specified as an attribute.  This is the most compact form.
+<xq:execute query="..."/>
+
+# The above query is equivalent to:
+<xq:execute>
+	<xq:query>...</xq:query>
+</xq:execute>
+
+# which is equivalent to:
+<xq:execute>
+	<xq:query>...</xq:query>
+	<xq:result><xq:streamItem/></xq:result>
+</xq:execute>
+
+# Run a query, using the named datasource, stream the result to
+# the output and separate each result item with the given string.
+# The separator is injected before each (possibly implicit) iteration
+# of the xq:result tag, except the first.
+<xq:execute dataSource="ds" separator="|" query="..."/>
+
+# Same as above, naming a server-resident module (not yet implemented)
+<xq:execute dataSource="ds" separator="|" module="module-name"/>
+
+# Run a query, set result (Result instance) in "var".
+# Query specified as an attribute.  The "var" will be set
+# to an instance of the Result interface (see below), which
+# encapsulates the entire, buffered result sequence.  This
+# variable remains set after execution of the tag completes
+# and no longer has any relationship to the XDBC call.
+<xq:execute var="attr-to-receive-result" query="..."/>
+
+# Run a query, set result (Result instance) in "var".
+# Query specified in nested xq:query tag, with optional xq:param tags
+<xq:execute var="result">
+	<xq:query>
+		arbitrary XQuery code
+	</xq:query>
+
+	<!-- default type = untyped atomic, default ns = empty string ns -->
+	<xq:param namespace="nsURI" localname="name" type="some-data-type-name">value</xq:param>
+</xq:execute>
+
+# More complex example using JSTL control tags (c:xxx) to
+# access ResultItem fields.  This builds an HTML table and populates
+# the rows with the result data (see ResultItem interface below).
+<xq:execute>
+	<xq:query>
+		for ...
+		let ...
+		return ...
+	</xq:query>
+
+	<table border="1" cellpadding="3" cellspacing="0">
+	<tr><th>Position</th><th>Value</th><th>Node?</th></tr>
+
+	<xq:result var="item">
+		<tr>
+			<td align="right"><c:out value="${item.index + 1}"/></td>
+			<td><c:out value="${item.string}" escapeXml="false" /></td>
+			<td align="center">
+				<c:if test="${item.node == true}">Yes</c:if>
+				<c:if test="${item.node == false}">No</c:if>
+			</td>
+		</tr>
+	</xq:result>
+
+	</table>
+</xq:execute>
+
+
 # specify data source with attributes alone.  Var is optional, will use default
 <xq:setDataSource var="foo" scope="page|request|session|application"
-	host="hostname" port="1234" user="joe" password="secret"
-	dataSource="java:com/env/xdbc/server"/>
+	host="hostname" port="1234" user="joe" password="secret"/>
+
+# specify datasource with JNDI key
+<xq:setDataSource var="foo" scope="page|request|session|application"
+	dataSource="java:com/env/xdbc/server"
+	user="joe" password="secret"/>
 
 # specify data source with child elements
 <xq:setDataSource var="foo" scope="page|request|session|application">
@@ -79,54 +192,15 @@ Tag Usage Examples
 
 # specify data source with child elements naming web.xml config params
 <xq:setDataSource var="foo" scope="page|request|session|application">
-	<xq:host initParameter="cishost"/>
-	<xq:port initParameter="cisport"/>
-	<xq:user initParameter="cisuser"/>
-	<xq:password initParameter="cispasswd"/>
-	<xq:dataSource initParameter="cisdatasource"/>
+	<xq:host initParameter="cishostparam"/>
+	<xq:port initParameter="cisportparam"/>
+	<xq:user initParameter="cisuserparam"/>
+	<xq:password initParameter="cispasswdparam"/>
+	<xq:dataSource initParameter="cisdatasourceparam"/>
 </xq:dataSource>
 
 # Clear datasource, using default var name if not specified
 <xq:unSetDataSource var="foo" scope="page|request|session|application"/>
-
-
-# Run a query, set result (Result instance) in "var".  DataSource name optional
-# Query specified as an attribute.
-<xq:execute var="attr-to-receive-result" dataSource="ds" query="..."/>
-
-# Run a query, result (as String concat) replaces tag, with "|"
-# between each result item.  DataSource name is optional
-# Query specified as the name of a module to run on the server.
-<xq:execute dataSource="ds" separator="|" module="module-name"/>
-
-# Run a query, set result (Result instance) in "var".  DataSource name optional
-# Query specified in nested xq:query tag, with optional xq:param tags
-<xq:execute dataSource="ds">
-	<xq:query>
-		arbitrary XQuery code
-	</xq:query>
-
-	# default type = untyped atomic, default ns = empty string ns
-	<xq:param namespace="nsURI" localname="name" type="XML Schema types no prefix">foo</xq:param>
-</xq:execute>
-
-# Streaming, iterating query using statement/resultSequence tags
-# Body of xq:resultSequence runs once for each result in the sequence
-<xq:execute dataSource="foo">
-	<xq:query>
-		for ...
-		let ...
-		return ...
-	</xq:query>
-
-	<xq:param namespace="nsURI" name="localname" type="XML Schema types no prefix">foo</xq:param>
-
-	<!-- May not be present if xq:execute@var is given -->
-	<xq:result var="var-to-set-item-to" scope="scope-of-var-attr">
-		<xq:printItem/>
-
-	</xq:result>
-</xq:execute>
 
 
 Java Interfaces used by xq:query
@@ -140,14 +214,13 @@ public interface Result
 	Item getItem (int index);
 }
 
-public interface Item
+public interface ResultItem
 {
-	int index;		// NEW!
+	int index;
 	boolean isNode();
-	boolean isStreamable();	// New!   Needed? (stream from object?)
 	Object getObject();
 	String getString();
-	Reader getReader();	// NEW!
+	Reader getReader();
 	org.w3c.dom.Document getW3cDom() throws XDBCException;
 	org.jdom.Document getJDom() throws XDBCException;
 }

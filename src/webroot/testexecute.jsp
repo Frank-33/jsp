@@ -1,7 +1,7 @@
 <%@ page language="java" %>
 <%@ taglib uri="http://marklogic.com/jsp/taglib" prefix="xq" %>
 
-<!-- This page is ow defunct, nested execute tag is no longer availale -->
+<!-- This page is now defunct, nested execute tag is no longer availale -->
 
 <html>
 <head>

@@ -131,7 +131,6 @@
 		<webdoclet destdir="${generated.files}" excludedtags="@version,@author" >
 			<fileset dir="${java.source}">
 				<include name="${taglib.java.dir}/rt/*Tag.java"/>
-				<include name="${taglib.java.dir}/statement/rt/*Tag.java"/>
 			</fileset>
 
 			<jsptaglib destdir="${jsp.taglib.def.dir}" filename="${taglib.file.name.rt}"
@@ -141,7 +140,6 @@
 		<webdoclet destdir="${generated.files}" excludedtags="@version,@author" >
 			<fileset dir="${java.source}">
 				<include name="${taglib.java.dir}/el/*Tag.java"/>
-				<include name="${taglib.java.dir}/statement/el/*Tag.java"/>
 			</fileset>
 
 			<jsptaglib destdir="${jsp.taglib.def.dir}" filename="${taglib.file.name.el}"

@@ -13,11 +13,17 @@ import javax.servlet.jsp.JspException;
  */
 public class ResultTag extends com.marklogic.jsptaglib.xquery.rt.ResultTag
 {
+	/**
+	 * @jsp:attribute required="false" rtexprvalue="false"
+	 */
 	public void setVar (String var) throws JspException
 	{
 		super.setVar ((String) ExpressionEvaluatorManager.evaluate ("var", var, String.class, this, pageContext));
 	}
 
+	/**
+	 * @jsp:attribute required="false" rtexprvalue="false"
+	 */
 	public void setScope (String scope) throws JspException
 	{
 		super.setScope ((String) ExpressionEvaluatorManager.evaluate ("scope", scope, String.class, this, pageContext));

@@ -100,7 +100,7 @@ public class ExecuteTag extends BodyTagSupport
 		this.dataSource = dataSource;
 	}
 
-	public void setQueryExecuted (boolean queryExecuted)
+	protected void setQueryExecuted (boolean queryExecuted)
 	{
 		this.queryExecuted = queryExecuted;
 	}

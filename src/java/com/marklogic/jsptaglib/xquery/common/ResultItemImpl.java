@@ -1,19 +1,19 @@
 package com.marklogic.jsptaglib.xquery.common;
 
-import com.marklogic.xdbc.XDBCSchemaTypes;
-import com.marklogic.xdbc.XDBCResultSequence;
-import com.marklogic.xdbc.XDBCException;
 import com.marklogic.jsptaglib.xquery.XdbcHelper;
+import com.marklogic.xdbc.XDBCException;
+import com.marklogic.xdbc.XDBCResultSequence;
+import com.marklogic.xdbc.XDBCSchemaTypes;
 
-import org.jdom.input.SAXBuilder;
 import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import java.io.Reader;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 
 /**
@@ -31,6 +31,8 @@ public class ResultItemImpl implements ResultItem
 	private org.w3c.dom.Document w3cDom = null;
 	private int index;
 
+	// ------------------------------------------------------------
+
 	public ResultItemImpl (XDBCResultSequence xdbcResultSequence, int index)
 		throws XDBCException
 	{
@@ -44,6 +46,8 @@ public class ResultItemImpl implements ResultItem
 			object = XdbcHelper.resultAsObject (xdbcResultSequence);
 		}
 	}
+
+	// ------------------------------------------------------------
 
 	public int getIndex ()
 	{
@@ -62,18 +66,13 @@ public class ResultItemImpl implements ResultItem
 
 	public String getString()
 	{
-		return ((string != null) ? string : object.toString());
-	}
-
-	public Reader getReader () throws IOException
-	{
-		throw new IOException ("Not yet implemented");
+		return ((string != null) ? string : getObject().toString());
 	}
 
 	public org.w3c.dom.Document getW3cDom() throws XDBCException
 	{
 		if (w3cDom == null) {
-			w3cDom = asW3cDom (string);
+			w3cDom = asW3cDom (getString());
 		}
 
 		return (w3cDom);
@@ -83,10 +82,15 @@ public class ResultItemImpl implements ResultItem
 		throws XDBCException
 	{
 		if (jdom == null) {
-			jdom = asJDom (string);
+			jdom = asJDom (getString());
 		}
 
 		return (jdom);
+	}
+
+	public Reader getReader()
+	{
+		return (new StringReader (getString()));
 	}
 
 	// -------------------------------------------------------

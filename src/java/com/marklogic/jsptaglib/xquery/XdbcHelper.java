@@ -34,7 +34,7 @@ public class XdbcHelper
 		XDBCConnectionFactory connectionFactory = XDBCConnectionFactory.newInstance();
 
 		if (user != null) {
-			// This is SOOOO broken
+			// This is SOOOO evil
 			Authenticator.setDefault (new XDMPAuthenticator (user, password));
 		}
 

@@ -6,7 +6,6 @@ package com.marklogic.jsptaglib.xquery.common;
 import com.marklogic.xdbc.XDBCException;
 
 import java.io.Reader;
-import java.io.IOException;
 
 /**
  * One of the result elements in a sequence returned by
@@ -59,10 +58,8 @@ public interface ResultItem
 
 	/**
 	 * @return A Reader from which the String representation of this
-	 *  result item can be read.
-	 * @throws IOException If there is a problem setting up the reader.
+	 *  result item can be read.  This a StringReader instance over
+	 *  the return value of getString().
 	 */
-	Reader getReader() throws IOException;
-
-	// FIXME: Need Numbers and dates?  Or are Strings enough?
+	Reader getReader();
 }

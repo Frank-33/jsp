@@ -3,44 +3,37 @@
  */
 package com.marklogic.jsptaglib.xquery.rt;
 
-import com.marklogic.jsptaglib.TagPropertyHelper;
 import com.marklogic.jsptaglib.AttributeHelper;
-import com.marklogic.jsptaglib.xquery.XdbcHelper;
+import com.marklogic.jsptaglib.TagPropertyHelper;
 import com.marklogic.jsptaglib.xquery.common.ResultItemImpl;
 import com.marklogic.xdbc.XDBCException;
 import com.marklogic.xdbc.XDBCResultSequence;
 
-import org.jdom.Document;
-import org.w3c.dom.Node;
-
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 import javax.servlet.jsp.tagext.TagSupport;
+import javax.servlet.jsp.tagext.TryCatchFinally;
 
 import java.io.IOException;
-import java.io.Reader;
+import java.io.BufferedReader;
 
 /**
  * @jsp:tag name="result" description="XDBC Result Sequence Tag"
  *  body-content="JSP"
  */
-public class ResultTag extends BodyTagSupport
+public class ResultTag extends BodyTagSupport implements TryCatchFinally
 {
 	private XDBCResultSequence xdbcResultSequence;
 	private String var = null;
-//	private boolean loop = true;
-//	private String name = null;
 	private String scope = null;
 
 	private int index = 0;
-	private boolean currentResultFetched = false;
-	private Object currentResultObject = null;
-	private Reader currentResultReader = null;
+	private boolean readerFetched = false;
 
 	// -----------------------------------------------------------
 
 	/**
-	 * @jsp:attribute required="true" rtexprvalue="true"
+	 * @jsp:attribute required="false" rtexprvalue="true"
 	 */
 	public void setVar (String var) throws JspException
 	{
@@ -50,123 +43,32 @@ public class ResultTag extends BodyTagSupport
 	/**
 	 * @jsp:attribute required="false" rtexprvalue="true"
 	 */
-//	public void setLoop (boolean loop)
-//	{
-//		this.loop = loop;
-//	}
-
-	/**
-	 * @jsp:attribute required="false" rtexprvalue="true"
-	 */
-//	public void setName (String name) throws JspException
-//	{
-//		this.name = name;
-//	}
-
-	/**
-	 * @jsp:attribute required="false" rtexprvalue="true"
-	 */
 	public void setScope (String scope) throws JspException
 	{
 		this.scope = scope;
 	}
 
+	protected BufferedReader getCurrentReader() throws JspException, XDBCException
+	{
+		if (var != null) {
+			throw new JspException ("Cannot stream if var attribute is set on result tag");
+		}
+
+		if (readerFetched) {
+			throw new JspException ("Attempt to fetch stream reader twice");
+		}
+
+		readerFetched = true;
+
+		return (xdbcResultSequence.nextReader());
+	}
+
 	public void release ()
 	{
 		xdbcResultSequence = null;
-//		loop = true;
 		var = null;
-//		name = null;
 		scope = null;
 		index = 0;
-	}
-
-	// -----------------------------------------------------------
-
-	/**
-	 * This private method assures that the cursor has been properly advanced.
-	 * It should be called by all the getCurrentResult* methods,
-	 * except getCurrentResultReader, before doing anything else.  The
-	 * opaque object returned by next() is only used as a marker.
-	 * @throws XDBCException Passed through from next().
-	 */
-	private void getCurrentResultObject ()
-		throws XDBCException
-	{
-		if (currentResultReader != null) {
-			throw new IllegalStateException ("getCurrentResultReader() previously called");
-		}
-
-		if (currentResultObject == null) {
-			currentResultObject = xdbcResultSequence.next();
-			currentResultFetched = true;
-		}
-	}
-
-	protected Reader getCurrentResultReader()
-		throws XDBCException
-	{
-		if (currentResultObject != null) {
-			throw new IllegalStateException ("getCurrentResultAs*() previously called");
-		}
-
-		if (currentResultReader == null) {
-			currentResultReader = xdbcResultSequence.nextReader();
-			currentResultFetched = true;
-		}
-
-		return currentResultReader;
-	}
-
-	protected Object getCurrentResultAsObject()
-		throws XDBCException
-	{
-		getCurrentResultObject();
-
-		return (XdbcHelper.resultAsObject (xdbcResultSequence));
-	}
-
-	protected String getCurrentResultAsString()
-		throws XDBCException
-	{
-		if (isCurrentResultNode()) {
-			return (xdbcResultSequence.getNode().asString());
-		}
-
-		return (getCurrentResultAsObject().toString());
-	}
-
-	protected Node getCurrentResultAsDom()
-		throws XDBCException
-	{
-		getCurrentResultObject();
-		validateResultIsNode ();
-
-		return (XdbcHelper.resultAsW3cDom (xdbcResultSequence));
-	}
-
-	protected Document getCurrentResultAsJDom()
-		throws XDBCException
-	{
-		getCurrentResultObject();
-		validateResultIsNode ();
-
-		return (XdbcHelper.resultAsJDom (xdbcResultSequence));
-	}
-
-	protected boolean isCurrentResultNode()
-		throws XDBCException
-	{
-		if (currentResultFetched == false) {
-			getCurrentResultObject();
-		}
-
-		return (xdbcResultSequence.getItemType() == XDBCResultSequence.XDBC_Node);
-	}
-
-	protected int getIndex ()
-	{
-		return index;
 	}
 
 	// -----------------------------------------------------------
@@ -183,6 +85,7 @@ public class ResultTag extends BodyTagSupport
 
 		try {
 			ExecuteTag statementTag = (ExecuteTag) findAncestorWithClass (this, ExecuteTag.class);
+
 			xdbcResultSequence = statementTag.executeQuery();
 
 			if (xdbcResultSequence.hasNext() == false) {
@@ -190,10 +93,8 @@ public class ResultTag extends BodyTagSupport
 			}
 
 			index = 0;
-//			currentResultFetched = false;		// FIXME
-//			stepToNextElement();
 
-			setItemVar (xdbcResultSequence, index);
+			setupNextItem (xdbcResultSequence, index);
 		} catch (XDBCException e) {
 			throw new JspException ("Executing query: " + e, e);
 		}
@@ -205,11 +106,9 @@ public class ResultTag extends BodyTagSupport
 	{
 		try {
 			if (xdbcResultSequence.hasNext()) {
-//				stepToNextElement();
-
 				index++;
-				
-				setItemVar (xdbcResultSequence, index);
+				setupNextItem (xdbcResultSequence, index);
+
 				return EVAL_BODY_BUFFERED;
 			}
 		} catch (XDBCException e) {
@@ -250,43 +149,38 @@ public class ResultTag extends BodyTagSupport
 
 	// -----------------------------------------------------------
 
-	private void setItemVar (XDBCResultSequence xdbcResultSequence, int index)
+	private void setupNextItem (XDBCResultSequence xdbcResultSequence, int index)
 		throws XDBCException
 	{
-		xdbcResultSequence.next();
+		if (var == null) {
+			if ((readerFetched == false) && (index != 0)) {
+				xdbcResultSequence.next();
+			}
 
-		AttributeHelper.setScopedAttribute (pageContext, var,
-			new ResultItemImpl (xdbcResultSequence, index), scope);
-	}
-
-	private void validateResultIsNode ()
-		throws XDBCException
-	{
-		if (xdbcResultSequence.getItemType() != XDBCResultSequence.XDBC_Node) {
-			throw new XDBCException ("Result is not a Node (result type: "
-				+ getCurrentResultAsObject().getClass().getName() + ")");
-		}
-	}
-
-	// TODO: Create Item object, set var if non-null
-	private void stepToNextElement ()
-		throws XDBCException
-	{
-		if (currentResultFetched == false) {
+			readerFetched = false;
+		} else {
 			xdbcResultSequence.next();
-		}
 
-		if (currentResultReader != null) {
+			AttributeHelper.setScopedAttribute (pageContext, var,
+				new ResultItemImpl (xdbcResultSequence, index), scope);
+		}
+	}
+
+	// -----------------------------------------------------------
+
+	public void doCatch (Throwable throwable) throws Throwable
+	{
+		throw throwable;
+	}
+
+	public void doFinally ()
+	{
+		if (xdbcResultSequence != null) {
 			try {
-				currentResultReader.close();
-			} catch (IOException e) {
-				// ignore, may have already been closed
+				xdbcResultSequence.close();
+			} catch (XDBCException e) {
+				// nothing
 			}
 		}
-
-		currentResultFetched = false;
-		currentResultObject = null;
-		currentResultReader = null;
-		index++;
 	}
 }
