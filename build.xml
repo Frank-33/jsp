@@ -1,10 +1,36 @@
+
+<!--
+/*
+ * Copyright (c)2004 Mark Logic Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * The use of the Apache License does not indicate that this project is
+ * affiliated with the Apache Software Foundation.
+ */
+-->
+
 <project name="jsptags" default="all" basedir=".">
+
+	<!-- NB: keep this in sync with ../project/project.xml -->
+	<property name="release.version" value="0.8"/>
 
 	<!-- Static definitions of where things are relative to the root -->
 	<property name="java.source" value="src/java"/>
 	<property name="junit.source" value="src/junit"/>
 	<property name="config.source" value="src/config"/>
 	<property name="webroot.source" value="src/webroot"/>
+	<property name="doc.source" value="src/docs"/>
 	<property name="buildtmp" value="buildtmp"/>
 	<property name="compiled.classes.dir" value="${buildtmp}/classes"/>
 	<property name="generated.files" value="${buildtmp}/generated"/>
@@ -30,12 +56,17 @@
 	<property name="jdom.jar" value="${jarlib}/jdom.jar"/>
 	<property name="apachejstl.jar" value="${jarlib}/standard.jar"/>
 
+	<!-- Intermediate generated files -->
+	<property name="bundle.staging.dir" value="${generated.files}/bundle"/>
+	<property name="taglib.output.jar" value="${bundle.staging.dir}/MLXQueryTaglib.jar"/>
+	<property name="output.warfile" value="${bundle.staging.dir}/MLJspDemoApp.war"/>
+	<property name="javadoc.zipfile" value="${bundle.staging.dir}/MLJspJavadocs.zip"/>
+
 	<!-- Products of this build -->
 	<property name="products" value="deliverable"/>
-	<property name="taglib.output.jar.name" value="mlxquerytags.jar"/>
-	<property name="taglib.output.jar" value="${products}/${taglib.output.jar.name}"/>
-	<property name="output.warfile" value="${products}/marklogicjsp.war"/>
-	<property name="javadoc.zipfile" value="${products}/mljspjavadocs.zip"/>
+	<property name="bundle.name" value="MLXQueryTaglib"/>
+	<property name="release.bundle" value="${products}/${bundle.name}-${release.version}.zip"/>
+	<property name="source.bundle" value="${products}/${bundle.name}-src-${release.version}.zip"/>
 
 	<!-- Configurable flags that will affect how targets run -->
 	<property name="compile.debug.symbols.flag" value="on"/>	<!-- on | off -->
@@ -63,6 +94,7 @@
 		<mkdir dir="${buildtmp}"/>
 		<mkdir dir="${compiled.classes.dir}"/>
 		<mkdir dir="${generated.files}"/>
+		<mkdir dir="${bundle.staging.dir}"/>
 		<mkdir dir="${jsp.taglib.def.dir}"/>
 		<mkdir dir="${products}"/>
 	</target>
@@ -76,8 +108,6 @@
 	</target>
 
 	<!-- ********************************************************** -->
-
-<!--	<property name="taglib.classes" value="com/marklogic/jsptaglib/*"/>-->
 
 	<path id="taglib.compile.classpath">
 		<pathelement path="${servlet.jar}"/>
@@ -187,8 +217,8 @@
 			<webinf dir="${config.source}">
 				<include name="${taglib.dir.name}/*.tld"/>
 			</webinf>
-			<lib dir="${products}">
-				<include name="${taglib.output.jar.name}"/>
+			<lib dir="${bundle.staging.dir}">
+				<include name="*.jar"/>
 			</lib>
 			<lib dir="${jarlib}">
 				<include name="xdbc.jar"/>
@@ -202,6 +232,33 @@
 
 	<!-- ********************************************************** -->
 
-	<target name="all" depends="init,taglibs,javadoc,webapp"/>
+	<target name="binarybundle" depends="init,webapp,javadoc">
+		<zip zipfile="${release.bundle}">
+			<fileset dir="${doc.source}">
+				<include name="*"/>
+			</fileset>
+			<fileset dir="${generated.files}">
+				<include name="${taglib.dir.name}/*.tld"/>
+			</fileset>
+			<fileset dir="${bundle.staging.dir}">
+				<include name="*"/>
+			</fileset>
+		</zip>
+	</target>
+
+	<target name="srcbundle">
+		<zip zipfile="${source.bundle}">
+			<fileset file="build.xml"/>
+			<fileset dir=".">
+				<include name="src/**"/>
+			</fileset>
+		</zip>
+	</target>
+
+	<!-- ********************************************************** -->
+
+	<target name="all" depends="binarybundle,srcbundle">
+		<copy file="${doc.source}/README.txt"  todir="${products}"/>
+	</target>
 
 </project>
