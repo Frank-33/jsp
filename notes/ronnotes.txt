@@ -39,6 +39,7 @@
 
 <xq:query dataSource="ds" separator="|" importModule="" importModuleNamespace="">
 	...<xq:escape>something literal</xq:escape>...
+	...<xq:escape escapeChars="()&">something else literal</xq:escape>...
 </xq:query>
 
 ---

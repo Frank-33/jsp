@@ -16,31 +16,67 @@ import java.io.IOException;
  */
 public class EscapeTag extends BodyTagSupport
 {
+	protected static String STD_CHARS_TO_ESCAPE = "\\{}<>'\"";
+	
+	private String escapeChars = STD_CHARS_TO_ESCAPE;
+
+	// --------------------------------------------------------------
+
+	public void release ()
+	{
+		escapeChars = STD_CHARS_TO_ESCAPE;
+	}
+
+	/**
+	 * Set the characters that should be escaped by preceding them
+	 * with a backslash.  These characters are specified as a String.
+	 * If a character appears in the input that is contained in this
+	 * string, it will be preceded with a backslash character in the
+	 * output.<br>
+	 * The default set of characters to escape is backslash,
+	 * left curly brace, right curly brace,
+	 * left angle bracket, right angle bracket, single and double
+	 * quote characters.
+	 * @jsp:attribute required="false" rtexprvalue="false"
+	 */
+	public void setEscapeChars (String escapeChars) throws JspException
+	{
+		this.escapeChars = escapeChars;
+	}
+
+	// --------------------------------------------------------------
+
 	public int doEndTag () throws JspException
 	{
-		JspWriter writer = pageContext.getOut();
 		char [] chars = getBodyChars (getBodyContent());
+		String escaped = escapeTheseChars (chars, escapeChars);
 
-		for (int i = 0; i < chars.length; i++) {
-			char c = chars[i];
+		JspWriter writer = pageContext.getOut();
 
-			// FIXME: get the rules right here for XQuery
-			try {
-				if (c == '\'') {
-					writer.print ('\'');
-				}
-
-				if (c == '{') {
-					writer.print ('\\');
-				}
-
-				writer.print (c);
-			} catch (IOException e) {
-				throw new JspException ("I/O Problem escaping string", e);
-			}
+		try {
+			writer.print (escaped);
+		} catch (IOException e) {
+			throw new JspException ("I/O Problem escaping string", e);
 		}
 
 		return EVAL_PAGE;
+	}
+
+	protected String escapeTheseChars (char [] chars, String escapeChars)
+	{
+		StringBuffer sb = new StringBuffer();
+
+		for (int i = 0; i < chars.length; i++) {
+			char c = chars [i];
+
+			if (escapeChars.indexOf (c) != -1) {
+				sb.append ('\\');
+			}
+
+			sb.append (c);
+		}
+
+		return (sb.toString());
 	}
 
 	private char[] getBodyChars (BodyContent bodyContent)

@@ -1,7 +1,7 @@
 <project>
 
   <!-- the name of the project -->
-  <name>Mark Logic ZQuery JSP Tag Library</name>
+  <name>Mark Logic XQuery JSP Tag Library</name>
 
   <!-- a short description of the project. This description
   will be used on the main site pages. No markup in here
