@@ -1,13 +1,15 @@
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>Test Connection</title>
+<link rel="stylesheet" href="ml.css" media="screen" />
 </head>
-<body  style="font-family:Arial,Helvetica,san-serif;background-color=#ddffee">
-<div align="center"><img src="http://www.marklogic.com/images/hm_head.gif"></div>
-<table border="0" cellpadding="10" align="center">
-<tr><td valign="center" align="right"><span style="font-size:28pt">Does </span></td><td align="left"><img src="images/javalogo.jpg"></td></tr>
-</table>
-<br>
+<body class="home">
+<div id="page">
+<div id="header">
+	<img src="images/global_head.gif" width="740" height="65" alt="" />
+</div>
+<div id="main">
+<div id="body">
 <table align="center" border="0" cellpadding="10">
 	<tr>
 		<td><a href="testquick.jsp">Simple XQuery via JSP (ronsoft.net)</a></td>
@@ -42,5 +44,14 @@
 		<td><a href="">Source</a></td>
 	</tr>
 </table>
+</div>
+</div>
+<div id="footer">
+
+
+<div id="copyrightnotice">Copyright 2004 Mark Logic Corporation</div>
+
+</div> <!-- end footer -->
+</div>
 </body>
 </html>
