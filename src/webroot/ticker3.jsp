@@ -25,9 +25,11 @@ Ticker: <input name="ticker" value="<%= ticker %>">
 %>
 
 <xq:setDataSource host="paycheck.demo.marklogic.com" port="8004" user="demo" password="demo" />
-<xq:query>
-    import module 'http://www.w3.org/2003/05/xpath-functions' at 'summarize-comp.xqy'
-	summary-table('<xq:escape><%=ticker%></xq:escape>')
-</xq:query>
+<xq:execute>
+	<xq:query>
+	    import module 'http://www.w3.org/2003/05/xpath-functions' at 'summarize-comp.xqy'
+		summary-table('<%=ticker%>')
+	</xq:query>
+</xq:execute>
 </body>
 </html>

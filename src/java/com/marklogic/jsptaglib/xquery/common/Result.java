@@ -23,7 +23,7 @@ public interface Result
 	/**
 	 * @return The full sequence of results as an array.
 	 */
-	ResultItem [] getSequence();
+	ResultItem [] getItem();
 
 	/**
 	 * @param index The index of the ResultItem object to return, the first

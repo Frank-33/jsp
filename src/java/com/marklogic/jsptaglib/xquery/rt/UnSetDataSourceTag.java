@@ -24,7 +24,7 @@ public class UnSetDataSourceTag extends TagSupport
 	private String var = SetDataSourceTag.ML_DEFAULT_DATASOURCE_VAR;
 
 	/**
-	 * @jsp:attribute required="false" rtexprvalue="false"
+	 * @jsp:attribute required="false" rtexprvalue="true"
 	 */
 	public void setScope (String scope) throws JspException
 	{
@@ -32,7 +32,7 @@ public class UnSetDataSourceTag extends TagSupport
 	}
 
 	/**
-	 * @jsp:attribute required="false" rtexprvalue="false"
+	 * @jsp:attribute required="false" rtexprvalue="true"
 	 */
 	public void setVar (String var) throws JspException
 	{

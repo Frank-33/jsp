@@ -25,7 +25,7 @@ public class StreamItemTag extends BodyTagSupport
 	private int bufferSize = DEFAULT_BUFFER_SIZE;
 
 	/**
-	 * @jsp:attribute required="false" rtexprvalue="false"
+	 * @jsp:attribute required="false" rtexprvalue="true"
 	 */
 	public void setBufferSize (int bufferSize)
 	{

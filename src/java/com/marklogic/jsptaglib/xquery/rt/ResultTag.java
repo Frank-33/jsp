@@ -23,14 +23,23 @@ import java.io.BufferedReader;
  */
 public class ResultTag extends BodyTagSupport implements TryCatchFinally
 {
-	private XDBCResultSequence xdbcResultSequence;
 	private String var = null;
 	private String scope = null;
 
+	private XDBCResultSequence xdbcResultSequence;
 	private int index = 0;
 	private boolean readerFetched = false;
 
 	// -----------------------------------------------------------
+
+	public void release ()
+	{
+		var = null;
+		scope = null;
+		xdbcResultSequence = null;
+		index = 0;
+		readerFetched = false;
+	}
 
 	/**
 	 * @jsp:attribute required="false" rtexprvalue="true"
@@ -63,14 +72,6 @@ public class ResultTag extends BodyTagSupport implements TryCatchFinally
 		return (xdbcResultSequence.nextReader());
 	}
 
-	public void release ()
-	{
-		xdbcResultSequence = null;
-		var = null;
-		scope = null;
-		index = 0;
-	}
-
 	// -----------------------------------------------------------
 
 	public int doStartTag() throws JspException
@@ -84,9 +85,9 @@ public class ResultTag extends BodyTagSupport implements TryCatchFinally
 		super.bodyContent = null;
 
 		try {
-			ExecuteTag statementTag = (ExecuteTag) findAncestorWithClass (this, ExecuteTag.class);
+			ExecuteTag executeTag = (ExecuteTag) findAncestorWithClass (this, ExecuteTag.class);
 
-			xdbcResultSequence = statementTag.executeQuery();
+			xdbcResultSequence = executeTag.executeQuery();
 
 			if (xdbcResultSequence.hasNext() == false) {
 				return SKIP_BODY;
@@ -112,7 +113,7 @@ public class ResultTag extends BodyTagSupport implements TryCatchFinally
 				return EVAL_BODY_BUFFERED;
 			}
 		} catch (XDBCException e) {
-			throw new JspException ("Iterating ResultSequenceTag, index=" + index, e);
+			throw new JspException ("Iterating ResultSequenceTag, index=" + index + ": " + e, e);
 		}
 
 		return EVAL_PAGE;
@@ -129,7 +130,7 @@ public class ResultTag extends BodyTagSupport implements TryCatchFinally
 				getPreviousOut().write (getBodyContent().getString());
 			}
 		} catch (IOException e) {
-			throw new JspException ("Writing end-tag result", e);
+			throw new JspException ("Writing end-tag result: + e", e);
 		} finally {
 			try {
 				xdbcResultSequence.close();

@@ -29,7 +29,7 @@ import java.io.IOException;
  * not set, then host/port/user/password attributes are used to construct
  * a new XDMPDataSource object.  The XDMPDataSource object will be set as
  * the value of the attribute named by 'var'.  If var is not provided, then
- * the value com.marklogic.jsptaglib.datasource will be used as a default.
+ * the value "com.marklogic.jsptaglib.datasource" will be used as a default.
  * The scope attribute is one of page, request, session or application."
  */
  public class SetDataSourceTag extends BodyTagSupport
@@ -38,7 +38,7 @@ import java.io.IOException;
 	public static String ML_DEFAULT_DATASOURCE_VAR = "com.marklogic.jsptaglib.xquery.datasource";
 
 	private String scope = null;
-	private String var = null;
+	private String var = ML_DEFAULT_DATASOURCE_VAR;
 	private Object dataSource = null;
 	private String host = null;
 	private int port = -1;
@@ -46,11 +46,6 @@ import java.io.IOException;
 	private String password = null;
 
 	// ------------------------------------------------------------------
-
-	public SetDataSourceTag()
-	{
-		release();
-	}
 
 	public void release()
 	{
@@ -61,52 +56,6 @@ import java.io.IOException;
 		port = -1;
 		user = null;
 		password = null;
-	}
-
-	// ------------------------------------------------------------------
-
-	public int doEndTag () throws JspException
-	{
-		XDMPDataSource xdmpDataSource = null;
-
-		if (dataSource != null) {
-			if (dataSource instanceof XDMPDataSource) {
-				xdmpDataSource = (XDMPDataSource) dataSource;
-			}
-
-			if (dataSource instanceof String) {
-					xdmpDataSource = getJndiDataSource ((String) dataSource);
-			}
-		}
-
-		if (xdmpDataSource == null) {
-			try {
-				xdmpDataSource = new XdmpDataSourceWrapper (host, port, user, password);
-			} catch (XDBCException e) {
-				throw new JspTagException ("Could not create DataSource for " + host
-					+ ":" + port + "/" + user);
-			}
-		}
-
-		AttributeHelper.setScopedAttribute (pageContext, var, xdmpDataSource, scope);
-
-		release();
-
-		return (EVAL_PAGE);
-	}
-
-	// Trim any excess whitespace from tag body
-	public int doAfterBody() throws JspException
-	{
-		try {
-			if (getBodyContent() != null) {
-				getPreviousOut().write (getBodyContent().getString().trim());
-			}
-		} catch (IOException e) {
-			throw new JspException ("trimming connection tag body", e);
-		}
-
-		return EVAL_PAGE;
 	}
 
 	// ------------------------------------------------------------------
@@ -168,6 +117,53 @@ import java.io.IOException;
 	}
 
 	// ------------------------------------------------------------------
+
+	// Trim any excess whitespace from tag body
+	public int doAfterBody() throws JspException
+	{
+		try {
+			if (getBodyContent() != null) {
+				getPreviousOut().write (getBodyContent().getString().trim());
+			}
+		} catch (IOException e) {
+			throw new JspException ("trimming setDataSource tag body", e);
+		}
+
+		return EVAL_PAGE;
+	}
+
+	public int doEndTag () throws JspException
+	{
+		XDMPDataSource xdmpDataSource = null;
+
+		if (dataSource != null) {
+			if (dataSource instanceof XDMPDataSource) {
+				xdmpDataSource = (XDMPDataSource) dataSource;
+			}
+
+			if (dataSource instanceof String) {
+					xdmpDataSource = getJndiDataSource ((String) dataSource);
+			}
+		}
+
+		if (xdmpDataSource == null) {
+			try {
+				xdmpDataSource = new XdmpDataSourceWrapper (host, port, user, password);
+			} catch (XDBCException e) {
+				throw new JspTagException ("Could not create DataSource for " + host
+					+ ":" + port + "/" + user);
+			}
+		}
+
+		AttributeHelper.setScopedAttribute (pageContext, var, xdmpDataSource, scope);
+
+		release();
+
+		return (EVAL_PAGE);
+	}
+
+	// ------------------------------------------------------------------
+
 
 	private XDMPDataSource getJndiDataSource (String jndiName)
 		throws JspException

@@ -37,7 +37,7 @@ public class ResultImpl implements Result
 		return (sequence.length);
 	}
 
-	public ResultItem [] getSequence ()
+	public ResultItem [] getItem ()
 	{
 		return (sequence);
 	}

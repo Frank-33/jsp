@@ -30,17 +30,18 @@ xq:execute
 		var		container variable to set Result to
 		scope		scope of var: page|request|session|application
 		dataSource	container variable holding DataSource
-				(default name used if not specified)
+				(default used if not specified)
 		query		body of query to send
 		module		name of module to invoke on server
 		separator	String to place between each result item if
 				the result is to be written out (var not given)
 	nestable tags
 		xq:query	body is arbitrary XQuery code to send
-		xq:param	body is parameter value, attrs are name/type/etc
+		xq:param	body is parameter value, attrs are namespace/localname/type
 		xq:result	body evaluated for each result item
 
 xq:query
+	no attributes, body is arbitrary XQuery code
 
 xq:param
 	attributes
@@ -48,7 +49,6 @@ xq:param
 		localname	local name of variable to create
 		type		type of variable (default untyped atomic)
 				(XML Schema types, without namespace prefix)
-
 xq:result
 	attributes
 		var		container variable to set current result Item to
@@ -59,6 +59,45 @@ xq:result
 xq:streamItem
 	attributes
 		bufferSize	Size of intermediate buffer to use for read/write loop
+
+
+Notes
+-----
+
+There are two modes of operation for these tags: buffered
+and streaming.  Results are buffered if a "var" attribute names
+a container variable to which the result should be assigned.  When
+buffered, the entire result is read into memory.  The stored data
+is then no longer dependent on an active XDBC connection.
+
+If no "var" attribute is given, then the result streams to the
+output.  This can happen implicitly, by not providing an xq:result,
+or explicitly by using the xq:streamItem inside the xq:result tag.
+
+The "var" attribute when given on the xq:execute tag specifies
+a variable to which an instance of the Result interface will be
+assigned.  That object represents a sequence of ResultItem
+objects.  When this attribute is given, a nested xq:result
+may NOT be used.
+
+When present, the body of the xq:result tag is iterated once
+for each item in the sequence of result items.  It's possible
+to have zero items in the sequence.  When not present, the
+result data is streamed to the output in string form.
+
+When "var" is specified on the xq:result tag, the variable will
+be assigned an instance of the ResultItem interface on each
+iteration (one iteration per item in the result sequence).  If
+this attribute is specified it contains the buffered data of the
+current result item.  The nested xq:streamItem tag my not be
+used if the "var" attribute is specified.
+
+The xq:streamItem tag, which is only valid inside xq:result,
+streams the current result item to the output.  The main usage
+of this tag is to decorate the item with additional data before
+and/or after the item data.  The result item may be arbitrarily
+large.  An optional buffer size attribute may be specified to
+optimize the copy for special cases.
 
 
 Tag Usage Examples
@@ -84,8 +123,8 @@ Tag Usage Examples
 
 # Explicit streaming using xq:result tag.  xq:streamItem may not be
 # used if xq:result@var is given.
-# Body of xq:resultSequence runs once for each result in the sequence
-<xq:execute dataSource="foo">
+# Body of xq:result runs once for each result in the sequence
+<xq:execute>
 	<xq:query>
 		for ...
 		let ...
@@ -100,7 +139,6 @@ Tag Usage Examples
 	</xq:result>
 </xq:execute>
 
-
 # Run a query, stream result to output, replacing tag
 # Query specified as an attribute.  This is the most compact form.
 <xq:execute query="..."/>
@@ -114,6 +152,14 @@ Tag Usage Examples
 <xq:execute>
 	<xq:query>...</xq:query>
 	<xq:result><xq:streamItem/></xq:result>
+</xq:execute>
+
+# Same as above, naming a module
+<xq:execute module="module-name"/>
+
+# Same as above, with parameters
+<xq:execute module="module-name">
+	<xq:param namespace="nsURI" name="localname" type="XML Schema types no prefix">foo</xq:param>
 </xq:execute>
 
 # Run a query, using the named datasource, stream the result to

@@ -6,7 +6,7 @@ package com.marklogic.jsptaglib.xquery.common;
 import javax.servlet.jsp.JspException;
 
 /**
- * Property setters associated with a DataSource tag.
+ * Property setters associated with a SetDataSource tag.
  * @author Ron Hitchens (ron.hitchens@marklogic.com)
  */
 public interface ConnectionProperties

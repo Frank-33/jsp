@@ -8,7 +8,8 @@
 <table style="background-color:#bbffff" width="90%" border="1" cellspacing="0" cellpadding="4" align="center">
 <tr style="color:white;background-color:black"><th>Track</th><th>Artist</th><th>Album</th><th>Genre</th></tr>
 <xq:setDataSource host="ronsoft.net" port="8003"/>
-<xq:query>
+<xq:execute>
+	<xq:query>
 	for $track in doc("itunes.xml")/plist/dict/dict[preceding-sibling::key = "Tracks"]/dict
 		let $name := $track/string[preceding-sibling::key = "Name"][1],
 		$artist := $track/string[preceding-sibling::key = "Artist"][1],
@@ -24,7 +25,8 @@
 			<td>{$album}</td>
 			<td>{$genre}</td>
 		</tr>
-</xq:query>
+	</xq:query>
+</xq:execute>
 </table>
 </body>
 </html>

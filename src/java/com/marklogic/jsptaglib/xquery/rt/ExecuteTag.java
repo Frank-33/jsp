@@ -3,7 +3,6 @@
  */
 package com.marklogic.jsptaglib.xquery.rt;
 
-import com.marklogic.jsptaglib.xquery.common.StatementProperties;
 import com.marklogic.jsptaglib.xquery.common.ResultImpl;
 import com.marklogic.jsptaglib.xquery.XdbcHelper;
 import com.marklogic.jsptaglib.AttributeHelper;
@@ -19,13 +18,15 @@ import javax.servlet.jsp.tagext.BodyTagSupport;
 import javax.servlet.jsp.tagext.TryCatchFinally;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @jsp:tag name="execute" description="Mark Logic XDBC Statement Tag"
  *  body-content="JSP"
  */
 public class ExecuteTag extends BodyTagSupport
-	implements StatementProperties, TryCatchFinally
+	implements TryCatchFinally
 {
 	private String var = null;
 	private String scope = null;
@@ -38,18 +39,21 @@ public class ExecuteTag extends BodyTagSupport
 
 	private XDBCStatement xdbcStatement = null;
 	private XDBCConnection xdbcConnection = null;
+	private List params = new ArrayList();
 
 	// -------------------------------------------------------------
 
 	public void release ()
 	{
-		dataSource = null;
-		query = null;
-		module = null;
-		xdbcStatement = null;
-		xdbcConnection = null;
 		var = null;
 		scope = null;
+		query = null;
+		module = null;
+		separator = null;
+		dataSource = null;
+		queryExecuted = false;
+		xdbcStatement = null;
+		xdbcConnection = null;
 	}
 
 	/**
@@ -100,9 +104,21 @@ public class ExecuteTag extends BodyTagSupport
 		this.dataSource = dataSource;
 	}
 
-	protected void setQueryExecuted (boolean queryExecuted)
+	// ------------------------------------------------------------------------
+
+	// must be public, accessed by reflection
+	public void setQueryExecuted (boolean queryExecuted)
 	{
 		this.queryExecuted = queryExecuted;
+	}
+
+	protected void addParam (String namespace, String localname, String type, String value)
+		throws JspException
+	{
+		params.add (new Param (namespace, localname, type, value));
+
+		// TODO: remove this when parameter handling is fully implemented
+		throw new JspException ("parameter handling is not yet implemented");
 	}
 
 	// ------------------------------------------------------------------------
@@ -118,14 +134,14 @@ public class ExecuteTag extends BodyTagSupport
 	public int doStartTag() throws JspException
 	{
 		if ((dataSource != null) && ( ! (dataSource instanceof XDMPDataSource))) {
-			throw new JspTagException ("DataSource must instance of XDMPDataSource");
+			throw new JspTagException ("DataSource must be an instance of XDMPDataSource");
 		}
 
 		try {
 			xdbcConnection = SetDataSourceTag.getConnection (pageContext, (XDMPDataSource) dataSource, true);
 			xdbcStatement = xdbcConnection.createStatement();
 		} catch (XDBCException e) {
-			throw new JspException ("Cannot create XDBCStatement", e);
+			throw new JspException ("Cannot create XDBCStatement: " + e, e);
 		}
 
 		return EVAL_BODY_INCLUDE;
@@ -138,7 +154,7 @@ public class ExecuteTag extends BodyTagSupport
 			try {
 				getPreviousOut().write (getBodyContent().getString().trim());
 			} catch (IOException e) {
-				throw new JspException("I/O Exception writing body", e);
+				throw new JspException("I/O Exception writing body: " + e, e);
 			}
 		}
 
@@ -156,8 +172,18 @@ public class ExecuteTag extends BodyTagSupport
 			throw new JspException ("Cannot use both var attribute and nested result tag");
 		}
 
+		if ((query != null) && (module != null)) {
+			throw new JspException ("Cannot specify both query and module name");
+		}
+
+		if (module != null) {
+			throw new JspException ("Module invocation not yet implemented");
+		}
+
 		try {
 			// TODO: Handle "module" attribute being set instead of "query"
+			// TODO: Handle setting parameters
+
 			XDBCResultSequence xdbcResultSequence = xdbcStatement.executeQuery (query);
 
 			if (var == null) {
@@ -166,11 +192,15 @@ public class ExecuteTag extends BodyTagSupport
 				setResult (xdbcResultSequence, var);
 			}
 		} catch (XDBCException e) {
-			throw new JspException ("executing query", e);
+			throw new JspException ("executing query: " + e, e);
 		}
+
+		release();
 
 		return EVAL_PAGE;
 	}
+
+	// ------------------------------------------------------------------------
 
 	private void setResult (XDBCResultSequence xdbcResultSequence, String var)
 		throws JspException
@@ -179,7 +209,7 @@ public class ExecuteTag extends BodyTagSupport
 			AttributeHelper.setScopedAttribute (pageContext, var,
 				new ResultImpl (xdbcResultSequence), scope);
 		} catch (XDBCException e) {
-			throw new JspException ("creating ResultItem object", e);
+			throw new JspException ("creating ResultItem object: " + e, e);
 		}
 	}
 
@@ -189,9 +219,9 @@ public class ExecuteTag extends BodyTagSupport
 		try {
 			XdbcHelper.concatResult (xdbcResultSequence, pageContext.getOut(), separator);
 		} catch (XDBCException e) {
-			throw new JspException ("processing result", e);
+			throw new JspException ("processing result: " + e, e);
 		} catch (IOException e) {
-			throw new JspException ("writing result", e);
+			throw new JspException ("writing result: " + e, e);
 		}
 	}
 
@@ -219,5 +249,43 @@ public class ExecuteTag extends BodyTagSupport
 		}
 
 		release();
+	}
+
+	// ------------------------------------------------------------------------
+
+	private class Param
+	{
+		private String namespace;
+		private String localname;
+		private String type;
+		private String value;
+
+		public Param (String namespace, String localname, String type, String value)
+		{
+			this.namespace = namespace;
+			this.localname = localname;
+			this.type = type;
+			this.value = value;
+		}
+
+		public String getNamespace ()
+		{
+			return namespace;
+		}
+
+		public String getLocalname ()
+		{
+			return localname;
+		}
+
+		public String getType ()
+		{
+			return type;
+		}
+
+		public String getValue ()
+		{
+			return value;
+		}
 	}
 }
