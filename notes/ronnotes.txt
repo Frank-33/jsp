@@ -1,0 +1,82 @@
+
+<xq:setDataSource id="foo" scope="page|request|session|application"
+	host="hostname" port="1234" user="joe" password="secret"
+	dataSource="java:com/env/xdbc/server" />
+
+<xq:setDataSource id="foo" scope="page|request|session|application">
+	<xq:host>hostname</xq:host>
+	<xq:port>1234</xq:port>
+	<xq:user>joe</xq:user>
+	<xq:password>joe</xq:password>
+	<xq:dataSource>java:com/env/xdbc/server</xq:dataSource>
+</xq:dataSource>
+
+<xq:unSetDataSource/>
+
+<xq:statement var="blah" dataSource="foo">
+	<xq:query importModule="blah.xqy" importModuleNamespace="blither">
+		for ...
+		let ...
+		return ...
+	</xq:query>
+	<xq:resultSequence var="attr-to-set-rs-to" name="attr-holding-existing-rs"
+		scope="scope-of-name-param" loop="true|false">
+
+		<xq:print/>
+		<xq:asObject id="attr-to-set-seq-element-to" scope="scope-of-attr"/>
+		<xq:asString id="attr-to-set-seq-element-to" scope="scope-of-attr"/>
+		<xq:asReader id="attr-to-set-seq-element-to" scope="scope-of-attr"/>
+		<xq:asDom id="attr-to-set-seq-element-to" scope="scope-of-attr"/>
+		<xq:asJDom id="attr-to-set-seq-element-to" scope="scope-of-attr"/>
+
+		<xq:isNode/>
+		<xq:isNotNode/>
+		<xq:getIndex zeroBased="true|false"/>
+	</xq:resultSequence>
+</xq:statement>
+
+<xq:query var="resultseq" dataSource="ds" separator="|" query="..."/>
+
+<xq:query dataSource="ds" separator="|" importModule="" importModuleNamespace="">
+	...
+</xq:query>
+
+---
+
+public interface ResultSequence
+{
+	int getSize();
+	Result [] getSequence();
+	Result getResult (int index);
+}
+
+public interface Result
+{
+	boolean isNode();
+	Object getObject();
+	String getString();
+	org.w3c.dom.Document getW3cDom() throws XDBCException;
+	org.jdom.Document getJDom() throws XDBCException;
+}
+
+------------------
+deprecated
+
+<xq:statement dataSource="foo">
+	<xq:query importModule="blah.xqy" importModuleNamespace="blither">
+		for ...
+		let ...
+		return ...
+	</xq:query>
+	<xq:execute separator="..." ignoreResult="true|false" ignoreErrors="true|false"/>
+</xq:statement>
+
+<xq:statement dataSource="foo">
+	<xq:query importModule="blah.xqy" importModuleNamespace="blither">
+		for ...
+		let ...
+		return ...
+	</xq:query>
+	<xq:setResult id="attr-to-set-result-to" firstOnly="true|false" ignoreErrors="true|false"/>
+</xq:statement>
+

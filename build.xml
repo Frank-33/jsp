@@ -1,0 +1,206 @@
+<project name="j2ee" default="all" basedir=".">
+
+	<!-- Static definitions of where things are relative to the root -->
+	<property name="java.source" value="src/java"/>
+	<property name="junit.source" value="src/junit"/>
+	<property name="config.source" value="src/config"/>
+	<property name="webroot.source" value="src/webroot"/>
+	<property name="buildtmp" value="buildtmp"/>
+	<property name="compiled.classes.dir" value="${buildtmp}/classes"/>
+	<property name="generated.files" value="${buildtmp}/generated"/>
+	<property name="javadoc.dir" value="${buildtmp}/javadocs"/>
+	<property name="taglib.dir.name" value="taglib"/>
+	<property name="taglib.file.name.el" value="marklogicxquery.tld"/>
+	<property name="taglib.file.name.rt" value="marklogicxquery-rt.tld"/>
+	<property name="jsp.taglib.def.dir" value="${generated.files}/${taglib.dir.name}"/>
+	<property name="taglib.java.dir" value="com/marklogic/jsptaglib/xquery"/>
+
+	<!-- Jar files that are under source control in this tree -->
+	<property name="jarlib" value="src/lib"/>
+	<property name="junit.jar" value="${jarlib}/junit.jar"/>
+	<property name="servlet.jar" value="${jarlib}/servlet.jar"/>
+	<property name="xdoclet.jar" value="${jarlib}/xdoclet-1.2.jar"/>
+	<property name="webdoclet.jar" value="${jarlib}/xdoclet-web-module-1.2.jar"/>
+	<property name="xjavadoc.jar" value="${jarlib}/xjavadoc-1.0.2.jar"/>
+	<property name="log4j.jar" value="${jarlib}/log4j.jar"/>
+	<property name="commons.collections.jar" value="${jarlib}/commons-collections-2.0.jar"/>
+	<property name="commons.logging.jar" value="${jarlib}/commons-logging.jar"/>
+	<property name="xdbc.jar" value="${jarlib}/xdbc.jar"/>
+	<property name="xdmp.jar" value="${jarlib}/xdmp.jar"/>
+	<property name="jdom.jar" value="${jarlib}/jdom.jar"/>
+	<property name="apachejstl.jar" value="${jarlib}/standard.jar"/>
+
+	<!-- Products of this build -->
+	<property name="products" value="deliverable"/>
+	<property name="taglib.output.jar.name" value="mlxquerytags.jar"/>
+	<property name="taglib.output.jar" value="${products}/${taglib.output.jar.name}"/>
+	<property name="output.warfile" value="${products}/marklogicjsp.war"/>
+	<property name="javadoc.zipfile" value="${products}/mljspjavadocs.zip"/>
+
+	<!-- Configurable flags that will affect how targets run -->
+	<property name="compile.debug.symbols.flag" value="on"/>	<!-- on | off -->
+	<property name="junit.halt.on.error" value="off"/>			<!-- on | off -->
+	<property name="junit.disabled" value="true"/>				<!-- true | false -->
+
+	<!-- ********************************************************** -->
+
+	<path id="webdoclet.classpath">
+		<pathelement path="${xdoclet.jar}"/>
+		<pathelement path="${webdoclet.jar}"/>
+		<pathelement path="${xjavadoc.jar}"/>
+		<pathelement path="${commons.collections.jar}"/>
+		<pathelement path="${commons.logging.jar}"/>
+		<pathelement path="${log4j.jar}"/>
+		<pathelement path="${servlet.jar}"/>
+	</path>
+
+	<taskdef name="webdoclet" classname="xdoclet.modules.web.WebDocletTask"
+		classpathref="webdoclet.classpath"/>
+
+	<!-- ********************************************************** -->
+
+	<target name="init">
+		<mkdir dir="${buildtmp}"/>
+		<mkdir dir="${compiled.classes.dir}"/>
+		<mkdir dir="${generated.files}"/>
+		<mkdir dir="${jsp.taglib.def.dir}"/>
+		<mkdir dir="${products}"/>
+	</target>
+
+	<target name="clean">
+			<delete dir="${buildtmp}"/>
+	</target>
+
+	<target name="cleanest" depends="clean">
+			<delete dir="${products}"/>
+	</target>
+
+	<!-- ********************************************************** -->
+
+<!--	<property name="taglib.classes" value="com/marklogic/jsptaglib/*"/>-->
+
+	<path id="taglib.compile.classpath">
+		<pathelement path="${servlet.jar}"/>
+		<pathelement path="${xdbc.jar}"/>
+		<pathelement path="${xdmp.jar}"/>
+		<pathelement path="${jdom.jar}"/>
+		<pathelement path="${apachejstl.jar}"/>
+		<pathelement path="${compiled.classes.dir}"/>
+	</path>
+
+	<path id="taglib.testcases.classpath">
+		<pathelement path="${servlet.jar}"/>
+		<pathelement path="${junit.jar}"/>
+		<pathelement path="${apachejstl.jar}"/>
+		<pathelement path="${compiled.classes.dir}"/>
+	</path>
+
+	<path id="xdoclet.classpath">
+		<pathelement path="${compiled.classes.dir}"/>
+	</path>
+
+	<target name="compile.taglib" depends="init">
+		<javac classpathref="taglib.compile.classpath" srcdir="${java.source}"
+			destdir="${compiled.classes.dir}" deprecation="on"
+			debug="${compile.debug.symbols.flag}" />
+	</target>
+
+	<target name="compile.taglib.tests" depends="compile.taglib">
+		<javac classpathref="xdbc.testcases.classpath" srcdir="${junit.source}"
+			destdir="${compiled.classes.dir}" deprecation="on"
+			debug="${compile.debug.symbols.flag}" />
+	</target>
+
+	<target name="test.taglib" depends="compile.taglib.tests"
+		unless="junit.disabled" >
+
+		<junit printsummary="on" haltonerror="${junit.halt.on.error}" showoutput="true">
+			<classpath refid="taglib.testcases.classpath"/>
+				<formatter type="plain" usefile="false"/>
+
+				<batchtest fork="no">
+						<fileset dir="${junit.source}" includes="**/Test*.java"/>
+				</batchtest>
+		</junit>
+	</target>
+
+	<target name="generate.taglib.def" depends="test.taglib">
+		<webdoclet destdir="${generated.files}" excludedtags="@version,@author" >
+			<fileset dir="${java.source}">
+				<include name="${taglib.java.dir}/rt/*Tag.java"/>
+				<include name="${taglib.java.dir}/statement/rt/*Tag.java"/>
+			</fileset>
+
+			<jsptaglib destdir="${jsp.taglib.def.dir}" filename="${taglib.file.name.rt}"
+				shortname="mltaglib1" displayname="Mark Logic JSP Tag Library (RT Version)"/>
+		</webdoclet>
+
+		<webdoclet destdir="${generated.files}" excludedtags="@version,@author" >
+			<fileset dir="${java.source}">
+				<include name="${taglib.java.dir}/el/*Tag.java"/>
+				<include name="${taglib.java.dir}/statement/el/*Tag.java"/>
+			</fileset>
+
+			<jsptaglib destdir="${jsp.taglib.def.dir}" filename="${taglib.file.name.el}"
+				shortname="mltaglib2" displayname="Mark Logic JSP Tag Library (EL Version)"/>
+		</webdoclet>
+	</target>
+
+	<target name="generate.taglib.jar" depends="generate.taglib.def">
+		<jar jarfile="${taglib.output.jar}">
+			<fileset dir="${jsp.taglib.def.dir}">
+				<include name="*.tld"/>
+			</fileset>
+			<fileset dir="${compiled.classes.dir}">
+				<exclude name="**/Test*.class"/>
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="taglibs" depends="generate.taglib.jar"/>
+
+	<!-- ********************************************************** -->
+
+	<target name="javadoc" depends="taglibs">
+		<mkdir dir="${javadoc.dir}"/>
+		<javadoc sourcepath="${java.source}" destdir="${javadoc.dir}" packagenames="*"
+			author="true" version="true" windowtitle="Mark Logic JSP TagLib">
+
+			<classpath refid="taglib.compile.classpath"/>
+			<doctitle><![CDATA[<h1>Mark Logic JSP TagLib</h1>]]></doctitle>
+			<bottom><![CDATA[<i>Copyright &copy; 2004 Mark Logic Corporation, All Rights Reserved.</i>]]></bottom>
+		</javadoc>
+		<zip zipfile="${javadoc.zipfile}" basedir="${javadoc.dir}"/>
+
+	</target>
+
+	<!-- ********************************************************** -->
+
+	<target name="webapp" depends="generate.taglib.jar">
+		<war warfile="${output.warfile}" basedir="${webroot.source}" update="false"
+			webxml="${config.source}/webapp/web.xml" >
+
+			<webinf dir="${generated.files}">
+				<include name="${taglib.dir.name}/*.tld"/>
+			</webinf>
+			<webinf dir="${config.source}">
+				<include name="${taglib.dir.name}/*.tld"/>
+			</webinf>
+			<lib dir="${products}">
+				<include name="${taglib.output.jar.name}"/>
+			</lib>
+			<lib dir="${jarlib}">
+				<include name="xdbc.jar"/>
+				<include name="xdmp.jar"/>
+				<include name="jdom.jar"/>
+				<include name="jstl.jar"/>
+				<include name="standard.jar"/>
+			</lib>
+		</war>
+	</target>
+
+	<!-- ********************************************************** -->
+
+	<target name="all" depends="init,taglibs,javadoc,webapp"/>
+
+</project>
