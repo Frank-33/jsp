@@ -1,4 +1,21 @@
 
+Mark Logic XQuery Tag Library Syntax
+------------------------------------
+
+Until I find the cycles to write up a proper programmer's
+guide for this tag library, this informal document will have
+to serve as the documentation for the syntax of the XQ tags.
+
+See also the the tutorial posted on the xq:zone Developer
+Site (http://xqzone.marklogic.com/howto/) for explanation
+of how to put the tags to use.  This document only lists
+the tag names, the atrributes they take and how the tags
+are allowed to nest.
+
+See also the TLD descriptor file which is auto-generated
+by the build from xdoclet tags in the source.
+
+
 Tag syntax
 ----------
 
@@ -73,10 +90,12 @@ is then no longer dependent on an active XDBC connection.
 If no "var" attribute is given, then the result streams to the
 output.  This can happen implicitly, by not providing an xq:result,
 or explicitly by using the xq:streamItem inside the xq:result tag.
+Note that "var" on xq:execute and a nested xq:result tag are
+mutually exclusive.
 
 The "var" attribute when given on the xq:execute tag specifies
 a variable to which an instance of the Result interface will be
-assigned.  That object represents a sequence of ResultItem
+assigned.  That object holds a sequence of ResultItem
 objects.  When this attribute is given, a nested xq:result
 may NOT be used.
 
@@ -103,12 +122,15 @@ optimize the copy for special cases.
 Tag Usage Examples
 ------------------
 
-# General form, using xq:result tag and buffered items
-# Body of xq:result runs once for each result in the sequence
+General form, using xq:result tag and buffered items
+Body of xq:result runs once for each result in the sequence
+
 <xq:execute dataSource="datasurce">
 	<xq:query>
 		for ...
 		let ...
+		where ...
+		order by ...
 		return ...
 	</xq:query>
 
@@ -121,9 +143,11 @@ Tag Usage Examples
 	</xq:result>
 </xq:execute>
 
-# Explicit streaming using xq:result tag.  xq:streamItem may not be
-# used if xq:result@var is given.
-# Body of xq:result runs once for each result in the sequence
+
+Explicit streaming using xq:result tag.  xq:streamItem may not be
+used if xq:result@var is given.
+Body of xq:result runs once for each result in the sequence
+
 <xq:execute>
 	<xq:query>
 		for ...
@@ -139,48 +163,65 @@ Tag Usage Examples
 	</xq:result>
 </xq:execute>
 
-# Run a query, stream result to output, replacing tag
-# Query specified as an attribute.  This is the most compact form.
+
+Run a query, stream result to output, replacing tag
+Query specified as an attribute.  This is the most compact form.
+
 <xq:execute query="..."/>
 
-# The above query is equivalent to:
+
+The above query is equivalent to:
+
 <xq:execute>
 	<xq:query>...</xq:query>
 </xq:execute>
 
-# which is equivalent to:
+
+which is equivalent to:
+
 <xq:execute>
 	<xq:query>...</xq:query>
 	<xq:result><xq:streamItem/></xq:result>
 </xq:execute>
 
-# Same as above, naming a module
+
+Same as above, naming a module
+
 <xq:execute module="module-name"/>
 
-# Same as above, with parameters
+
+Same as above, with parameters
+
 <xq:execute module="module-name">
 	<xq:param namespace="nsURI" name="localname" type="XML Schema types no prefix">foo</xq:param>
 </xq:execute>
 
-# Run a query, using the named datasource, stream the result to
-# the output and separate each result item with the given string.
-# The separator is injected before each (possibly implicit) iteration
-# of the xq:result tag, except the first.
+
+Run a query, using the named datasource, stream the result to
+the output and separate each result item with the given string.
+The separator is injected before each (possibly implicit) iteration
+of the xq:result tag, except the first.
+
 <xq:execute dataSource="ds" separator="|" query="..."/>
 
-# Same as above, naming a server-resident module (not yet implemented)
+
+Same as above, naming a server-resident module (not yet implemented)
+
 <xq:execute dataSource="ds" separator="|" module="module-name"/>
 
-# Run a query, set result (Result instance) in "var".
-# Query specified as an attribute.  The "var" will be set
-# to an instance of the Result interface (see below), which
-# encapsulates the entire, buffered result sequence.  This
-# variable remains set after execution of the tag completes
-# and no longer has any relationship to the XDBC call.
+
+Run a query, set result (Result instance) in "var".
+Query specified as an attribute.  The "var" will be set
+to an instance of the Result interface (see below), which
+encapsulates the entire, buffered result sequence.  This
+variable remains set after execution of the tag completes
+and no longer has any relationship to the XDBC call.
+
 <xq:execute var="attr-to-receive-result" query="..."/>
 
-# Run a query, set result (Result instance) in "var".
-# Query specified in nested xq:query tag, with optional xq:param tags
+Run a query, set result (Result instance) in "var".
+Query specified in nested xq:query tag, with optional xq:param tags
+
 <xq:execute var="result">
 	<xq:query>
 		arbitrary XQuery code
@@ -190,9 +231,11 @@ Tag Usage Examples
 	<xq:param namespace="nsURI" localname="name" type="some-data-type-name">value</xq:param>
 </xq:execute>
 
-# More complex example using JSTL control tags (c:xxx) to
-# access ResultItem fields.  This builds an HTML table and populates
-# the rows with the result data (see ResultItem interface below).
+
+More complex example using JSTL control tags (c:xxx) to
+access ResultItem fields.  This builds an HTML table and populates
+the rows with the result data (see ResultItem interface below).
+
 <xq:execute>
 	<xq:query>
 		for ...
@@ -218,16 +261,21 @@ Tag Usage Examples
 </xq:execute>
 
 
-# specify data source with attributes alone.  Var is optional, will use default
+specify data source with attributes alone.  Var is optional, will use default
+
 <xq:setDataSource var="foo" scope="page|request|session|application"
 	host="hostname" port="1234" user="joe" password="secret"/>
 
-# specify datasource with JNDI key
+
+specify datasource with JNDI key
+
 <xq:setDataSource var="foo" scope="page|request|session|application"
 	dataSource="java:com/env/xdbc/server"
 	user="joe" password="secret"/>
 
-# specify data source with child elements
+
+specify data source with child elements
+
 <xq:setDataSource var="foo" scope="page|request|session|application">
 	<xq:host>hostname</xq:host>
 	<xq:port>1234</xq:port>
@@ -236,7 +284,9 @@ Tag Usage Examples
 	<xq:dataSource>java:com/env/xdbc/server</xq:dataSource>
 </xq:dataSource>
 
-# specify data source with child elements naming web.xml config params
+
+specify data source with child elements naming web.xml config params
+
 <xq:setDataSource var="foo" scope="page|request|session|application">
 	<xq:host initParameter="cishostparam"/>
 	<xq:port initParameter="cisportparam"/>
@@ -245,14 +295,16 @@ Tag Usage Examples
 	<xq:dataSource initParameter="cisdatasourceparam"/>
 </xq:dataSource>
 
-# Clear datasource, using default var name if not specified
+
+Clear datasource, using default var name if not specified
 <xq:unSetDataSource var="foo" scope="page|request|session|application"/>
 
 
-Java Interfaces used by xq:query
---------------------------------
+Java Interfaces used by the XQ tags
+-----------------------------------
 
-# An instance of this may be set in "var" by the xq:execute tag
+An instance of this may be set in "var" by the xq:execute tag
+
 public interface Result
 {
 	int getSize();
@@ -260,7 +312,8 @@ public interface Result
 	Item getItem (int index);
 }
 
-# An instance of this may be set in "var" by the xq:result tag
+
+An instance of this may be set in "var" by the xq:result tag
 public interface ResultItem
 {
 	int index;
@@ -271,3 +324,7 @@ public interface ResultItem
 	org.w3c.dom.Document getW3cDom() throws XDBCException;
 	org.jdom.Document getJDom() throws XDBCException;
 }
+
+---
+Rh 7/18/2004
+Mark Logic Corporation
