@@ -4,7 +4,7 @@ Tag syntax
 
 xq:setDataSource
 	attributes
-		var		container variable to set DS to
+		var		container variable to set datasource to
 				(default name used if not specified)
 		scope		scope of var: page|request|session|application
 		host		host name to connect to
@@ -86,7 +86,7 @@ Tag Usage Examples
 	<xq:dataSource initParameter="cisdatasource"/>
 </xq:dataSource>
 
-# Clear datasource, using default name if not specified
+# Clear datasource, using default var name if not specified
 <xq:unSetDataSource var="foo" scope="page|request|session|application"/>
 
 
@@ -99,7 +99,7 @@ Tag Usage Examples
 # Query specified as the name of a module to run on the server.
 <xq:execute dataSource="ds" separator="|" module="module-name"/>
 
-# Run a query, set result (ResultSequence) in "var".  DataSource name optional
+# Run a query, set result (Result instance) in "var".  DataSource name optional
 # Query specified in nested xq:query tag, with optional xq:param tags
 <xq:execute dataSource="ds">
 	<xq:query>
@@ -107,12 +107,12 @@ Tag Usage Examples
 	</xq:query>
 
 	# default type = untyped atomic, default ns = empty string ns
-    <xq:param namespace="nsURI" localname="name" type="XML Schema types no prefix">foo</xq:param>
+	<xq:param namespace="nsURI" localname="name" type="XML Schema types no prefix">foo</xq:param>
 </xq:execute>
 
 # Streaming, iterating query using statement/resultSequence tags
 # Body of xq:resultSequence runs once for each result in the sequence
-<xq:execute var="attr-to-receive-result" dataSource="foo">
+<xq:execute dataSource="foo">
 	<xq:query>
 		for ...
 		let ...
@@ -122,20 +122,9 @@ Tag Usage Examples
 	<xq:param namespace="nsURI" name="localname" type="XML Schema types no prefix">foo</xq:param>
 
 	<!-- May not be present if xq:execute@var is given -->
-	<xq:result var="var-to-set-item-to" scope="scope-of-name-param">
+	<xq:result var="var-to-set-item-to" scope="scope-of-var-attr">
 		<xq:printItem/>
 
-<!--
-		<xq:asObject id="attr-to-set-seq-element-to" scope="scope-of-attr"/>
-		<xq:asString id="attr-to-set-seq-element-to" scope="scope-of-attr"/>
-		<xq:asReader id="attr-to-set-seq-element-to" scope="scope-of-attr"/>
-		<xq:asDom id="attr-to-set-seq-element-to" scope="scope-of-attr"/>
-		<xq:asJDom id="attr-to-set-seq-element-to" scope="scope-of-attr"/>
-
-		<xq:isNode/>
-		<xq:isNotNode/>
-		<xq:getPosition/>
--->
 	</xq:result>
 </xq:execute>
 
