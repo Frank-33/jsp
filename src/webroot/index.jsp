@@ -10,7 +10,15 @@
 <br>
 <table align="center" border="0" cellpadding="10">
 	<tr>
-		<td><a href="teststmt.jsp">Test XQuery via JSP (ronsoft.net)</a></td>
+		<td><a href="testquick.jsp">Simple XQuery via JSP (ronsoft.net)</a></td>
+		<td><a href="">Source</a></td>
+	</tr>
+	<tr>
+		<td><a href="testquick2.jsp">Simple XQuery in a table (ronsoft.net)</a></td>
+		<td><a href="">Source</a></td>
+	</tr>
+	<tr>
+		<td><a href="teststmt.jsp">Streaming XQuery in a table (ronsoft.net)</a></td>
 		<td><a href="">Source</a></td>
 	</tr>
 	<tr>

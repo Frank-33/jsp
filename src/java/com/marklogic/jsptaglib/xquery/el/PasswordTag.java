@@ -13,6 +13,9 @@ import javax.servlet.jsp.JspException;
  */
 public class PasswordTag extends com.marklogic.jsptaglib.xquery.rt.PasswordTag
 {
+	/**
+	 * @jsp:attribute required="false" rtexprvalue="false"
+	 */
 	public void setInitParameter (String parameterName) throws JspException
 	{
 		super.setInitParameter ((String) ExpressionEvaluatorManager.evaluate ("initParameter", parameterName, String.class, this, pageContext));

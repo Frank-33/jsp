@@ -116,6 +116,10 @@ public class ResultSequenceImpl implements ResultSequence
 		private org.jdom.Document asJDom (String string)
 			throws XDBCException
 		{
+			if (isNode() == false) {
+				throw new XDBCException ("Result is not a node");
+			}
+
 			try {
 				return (new SAXBuilder().build (new StringReader (string)));
 			} catch (JDOMException e) {
@@ -128,6 +132,10 @@ public class ResultSequenceImpl implements ResultSequence
 		private org.w3c.dom.Document asW3cDom (String string)
 			throws XDBCException
 		{
+			if (isNode() == false) {
+				throw new XDBCException ("Result is not a node");
+			}
+
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance ();
 
 			try {

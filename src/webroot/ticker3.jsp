@@ -1,6 +1,4 @@
 <%@ taglib uri="http://marklogic.com/jsp/taglib" prefix="xq" %>
-<%@ page import = "com.marklogic.xdmp.*" %>
-<%@ page import = "com.marklogic.xdbc.*" %>
 
 <html>
 <head>
@@ -26,10 +24,10 @@ Ticker: <input name="ticker" value="<%= ticker %>">
   }
 %>
 
-<xq:setDataSource host="paycheck.demo.marklogic.com" port="8004" user="demo" password="demo"/>
+<xq:setDataSource host="paycheck.demo.marklogic.com" port="8004" user="demo" password="demo" />
 <xq:query>
     import module 'http://www.w3.org/2003/05/xpath-functions' at 'summarize-comp.xqy'
-	summary-table('<%=ticker%>')
+	summary-table('<xq:escape><%=ticker%></xq:escape>')
 </xq:query>
 </body>
 </html>

@@ -14,6 +14,9 @@ import javax.servlet.jsp.JspException;
  */
 public class DataSourceTag extends com.marklogic.jsptaglib.xquery.rt.DataSourceTag
 {
+	/**
+	 * @jsp:attribute required="false" rtexprvalue="false"
+	 */
 	public void setInitParameter (String parameterName) throws JspException
 	{
 		super.setInitParameter ((String) ExpressionEvaluatorManager.evaluate ("initParameter", parameterName, String.class, this, pageContext));
