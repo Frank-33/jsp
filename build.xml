@@ -23,7 +23,7 @@
 <project name="jsptags" default="all" basedir=".">
 
 	<!-- NB: keep this in sync with ../project/project.xml -->
-	<property name="release.version" value="0.8"/>
+	<property name="release.version" value="0.9"/>
 
 	<!-- Static definitions of where things are relative to the root -->
 	<property name="java.source" value="src/java"/>

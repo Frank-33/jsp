@@ -65,7 +65,7 @@ xq:variable
 		namespace	namespace URI (default = empty string namespace)
 		localname	local name of variable to create
 		type		type of variable (default xs:untypedAtomic)
-				(XML Schema types, without namespace prefix)
+				(XML Schema types)
 		value		variable value as a string
 
 xq:result
