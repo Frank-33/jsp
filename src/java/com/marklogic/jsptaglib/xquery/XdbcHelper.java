@@ -35,9 +35,11 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.Authenticator;
 
+// FIXME: Delete the class
 /**
  * Helper class with methods to assist in XDBC operations.
  * @author Ron Hitchens (ron.hitchens@marklogic.com)
+ * @deprecated Do not use this
  */
 public class XdbcHelper
 {

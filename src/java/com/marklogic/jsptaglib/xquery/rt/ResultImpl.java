@@ -27,6 +27,7 @@ import com.marklogic.xdbc.XDBCResultSequence;
 import java.util.ArrayList;
 import java.util.List;
 
+// FIXME: Delete this class
 /**
  * Implementation of the Result interface which holds the
  * buffered result of an XQuery execution.

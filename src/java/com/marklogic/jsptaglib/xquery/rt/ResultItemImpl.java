@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 
+// FIXME: Delete this class
 /**
  * Implementation of the ResultItem interface.
  * @author Ron Hitchens (ron.hitchens@marklogic.com)

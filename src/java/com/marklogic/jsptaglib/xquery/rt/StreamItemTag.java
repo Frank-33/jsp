@@ -18,14 +18,13 @@
  */
 package com.marklogic.jsptaglib.xquery.rt;
 
-import com.marklogic.jsptaglib.xquery.XdbcHelper;
-
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.Writer;
 
 /**
  * @jsp:tag name="streamItem" body-content="empty"
@@ -67,7 +66,7 @@ public class StreamItemTag extends BodyTagSupport
 		try {
 			Reader reader = resultTag.getCurrentReader();
 
-			XdbcHelper.passThroughChars (reader, pageContext.getOut(), bufferSize);
+			passThroughChars (reader, pageContext.getOut(), bufferSize);
 
 			reader.close();
 		} catch (IOException e) {
@@ -75,5 +74,24 @@ public class StreamItemTag extends BodyTagSupport
 		}
 
 		return (EVAL_PAGE);
+	}
+
+	/**
+	 * Copy all chars from the Reader to the Writer
+	 * @param reader A source of chars
+	 * @param writer The sink that accepts chars
+	 * @param buffersize The size of the intermediate buffer to use
+	 * @throws IOException Thrown if there is an I/O problem
+	 */
+	private void passThroughChars (Reader reader, Writer writer,
+		int buffersize)
+		throws IOException
+	{
+		int rc;
+		char buffer [] = new char [buffersize];
+
+		while ((rc = reader.read (buffer)) > 0) {
+			writer.write (buffer, 0, rc);
+		}
 	}
 }

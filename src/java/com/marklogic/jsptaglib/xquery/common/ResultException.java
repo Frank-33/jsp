@@ -22,6 +22,7 @@ package com.marklogic.jsptaglib.xquery.common;
  * General purpose exception indicating a problem with
  * a result.  All instances of thi class will be chained
  * to a causing exception (getCause()).
+ * @see Exception#getCause()
  * @author Ron Hitchens, Mark Logic Corporation
  */
 public class ResultException extends Exception

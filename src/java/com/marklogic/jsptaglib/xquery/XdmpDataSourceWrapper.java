@@ -22,10 +22,12 @@ import com.marklogic.xdmp.XDMPDataSource;
 import com.marklogic.xdbc.XDBCException;
 import com.marklogic.xdbc.XDBCConnection;
 
+// FIXME: Delete this class
 /**
  * Wrapper for the XDMPDataSource class which associates default user/password
  * values with connections requests that don't specify them.
  * @author Ron Hitchens (ron.hitchens@marklogic.com)
+ * @deprecated Do not use this
  */
 public class XdmpDataSourceWrapper extends XDMPDataSource
 {

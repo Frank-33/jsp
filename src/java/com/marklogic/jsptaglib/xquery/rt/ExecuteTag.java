@@ -129,9 +129,6 @@ public class ExecuteTag extends BodyTagSupport
 		throws JspException
 	{
 		vars.add (new Var (namespace, localname, type, value));
-
-		// TODO: remove this when parameter handling is fully implemented
-//		throw new JspException ("parameter handling is not yet implemented");
 	}
 
 	// ------------------------------------------------------------------------
