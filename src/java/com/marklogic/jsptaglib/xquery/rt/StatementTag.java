@@ -1,7 +1,7 @@
 /*
  * Copyright 2004 Mark Logic Corporation. All Rights Reserved.
  */
-package com.marklogic.jsptaglib.xquery.statement.rt;
+package com.marklogic.jsptaglib.xquery.rt;
 
 import com.marklogic.jsptaglib.xquery.rt.SetDataSourceTag;
 import com.marklogic.jsptaglib.xquery.common.StatementProperties;

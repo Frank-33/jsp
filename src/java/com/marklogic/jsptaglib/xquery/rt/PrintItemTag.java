@@ -1,7 +1,7 @@
 /*
  * Copyright 2004 Mark Logic Corporation. All Rights Reserved.
  */
-package com.marklogic.jsptaglib.xquery.statement.rt;
+package com.marklogic.jsptaglib.xquery.rt;
 
 import com.marklogic.xdbc.XDBCException;
 import com.marklogic.jsptaglib.xquery.XdbcHelper;
@@ -14,10 +14,10 @@ import java.io.Writer;
 import java.io.IOException;
 
 /**
- * @jsp:tag name="print" body-content="empty"
+ * @jsp:tag name="printItem" body-content="empty"
  *  description="Send current element to output as a string"
  */
-public class PrintTag extends BodyTagSupport
+public class PrintItemTag extends BodyTagSupport
 {
 	public int doEndTag () throws JspException
 	{

@@ -1,7 +1,7 @@
 /*
  * Copyright 2004 Mark Logic Corporation. All Rights Reserved.
  */
-package com.marklogic.jsptaglib.xquery.statement.el;
+package com.marklogic.jsptaglib.xquery.el;
 
 import com.marklogic.xdmp.XDMPDataSource;
 
@@ -13,7 +13,7 @@ import javax.servlet.jsp.JspException;
  * @jsp:tag name="statement" description="Statement Tag, Expression Language enabled"
  *  body-content="JSP"
  */
-public class StatementTag extends com.marklogic.jsptaglib.xquery.statement.rt.StatementTag
+public class StatementTag extends com.marklogic.jsptaglib.xquery.rt.StatementTag
 {
 	/**
 	 * @jsp:attribute required="false" rtexprvalue="false"

@@ -4,6 +4,7 @@
 package com.marklogic.jsptaglib.xquery.statement.rt;
 
 import com.marklogic.jsptaglib.AttributeHelper;
+import com.marklogic.jsptaglib.xquery.rt.ResultSequenceTag;
 import com.marklogic.xdbc.XDBCException;
 
 import javax.servlet.jsp.tagext.TagSupport;
