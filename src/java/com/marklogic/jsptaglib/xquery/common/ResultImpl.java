@@ -21,18 +21,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ResultSequenceImpl implements ResultSequence
+public class ResultImpl implements Result
 {
 	ResultItem [] sequence;
 
-	public ResultSequenceImpl (XDBCResultSequence xdbcResultSequence) throws XDBCException
+	public ResultImpl (XDBCResultSequence xdbcResultSequence) throws XDBCException
 	{
 		List list = new ArrayList();
 
 		while (xdbcResultSequence.hasNext()) {
 			xdbcResultSequence.next();
 
-			list.add (new ResultImpl (xdbcResultSequence));
+			list.add (new ResultItemImpl (xdbcResultSequence));
 		}
 
 		sequence = new ResultItem [list.size()];
@@ -57,7 +57,7 @@ public class ResultSequenceImpl implements ResultSequence
 
 	// ------------------------------------------------------------
 
-	public static class ResultImpl implements ResultItem
+	public static class ResultItemImpl implements ResultItem
 	{
 		private XDBCSchemaTypes.Node node;
 		private Object object;
@@ -65,7 +65,7 @@ public class ResultSequenceImpl implements ResultSequence
 		private org.jdom.Document jdom = null;
 		private org.w3c.dom.Document w3cDom = null;
 
-		public ResultImpl (XDBCResultSequence xdbcResultSequence)
+		public ResultItemImpl (XDBCResultSequence xdbcResultSequence)
 			throws XDBCException
 		{
 			if (xdbcResultSequence.getItemType() == XDBCResultSequence.XDBC_Node) {

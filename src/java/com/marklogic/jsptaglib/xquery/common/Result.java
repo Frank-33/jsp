@@ -13,7 +13,7 @@ package com.marklogic.jsptaglib.xquery.common;
  * If you need streaming, see the xq:statement and
  * xq:resultSequence tags.
  */
-public interface ResultSequence
+public interface Result
 {
 	/**
 	 * @return The number of ResultItem elements the sequence.
