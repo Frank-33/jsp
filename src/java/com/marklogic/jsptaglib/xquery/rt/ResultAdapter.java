@@ -23,11 +23,6 @@ import com.marklogic.jsptaglib.xquery.common.ResultException;
 import com.marklogic.jsptaglib.xquery.common.ResultItem;
 import com.marklogic.xqrunner.XQException;
 import com.marklogic.xqrunner.XQResult;
-import com.marklogic.xqrunner.XQResultItem;
-
-import org.w3c.dom.Document;
-
-import java.io.Reader;
 
 /**
  * Created by IntelliJ IDEA.

@@ -82,10 +82,13 @@ public class ResultTag extends BodyTagSupport implements TryCatchFinally
 		}
 
 		if (readerFetched) {
-			throw new JspException ("Attempt to fetch stream reader twice");
+			throw new JspException ("Attempt to fetch streaming item reader twice");
 		}
 
-		readerFetched = true;
+		if (var == null) {
+			// if buffered, ok to call multiple times
+			readerFetched = true;
+		}
 
 		try {
 			return currentItem.asReader();
