@@ -1,25 +1,17 @@
 <project>
+
+  <!-- the name of the project -->
   <name>Mark Logic JSP tag library</name>
+
+  <!-- a short description of the project. This description 
+  will be used on the main site pages. No markup in here
+  please. Just plain text -->
   <abstract>
   A tag library allowing JSP pages to access Mark Logic CIS
   </abstract>
-  <description>
-    <p>
-    This content is from the description tag and can contain any
-    amount of HTML markup. Such as the following list:
-    </p>
-    <ul>
-        <li>Easy to use</li>
-	<li>Easy to install</li>
-    </ul>
-    <p>
-    This description will be slurped up into the project page lists
-    </p>
-  </description>
 
-  <distribution>
-    Instructions about how to snag distributions to be placed here.
-  </distribution>
-
+  <!-- there can be 0 to many notify tags. Each tag contains an
+  email address to be notified on changes to the repository -->
+  <notify>duncan@x180.net</notify>
 
 </project>
