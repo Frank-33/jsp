@@ -18,7 +18,7 @@
 		<td><c:out value="${item.string}"/></td>
 		<td><a href="<c:url value="ShowDocument.jsp"><c:param name="type" value="plain"/><c:param name="doc" value="${item.string}"/></c:url>">Text</a></td>
 		<td><a href="<c:url value="ShowDocument.jsp"><c:param name="type" value="xml"/><c:param name="doc" value="${item.string}"/></c:url>">XML</a></td>
-		<td><a href="<c:url value="ShowDocument.jsp"><c:param name="type" value="html"/><c:param name="doc" value="${item.string}"/></c:url>">HTML</a></td>
+		<td><a href="<c:url value="ShowDocument.jsp"><c:param name="type" value="html"/><c:param name="doc" value="${item.string}"/></c:url>">XHTML</a></td>
 	</tr>
 	</xq:result>
 	</table>
