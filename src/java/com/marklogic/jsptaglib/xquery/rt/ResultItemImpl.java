@@ -1,6 +1,7 @@
-package com.marklogic.jsptaglib.xquery.common;
+package com.marklogic.jsptaglib.xquery.rt;
 
 import com.marklogic.jsptaglib.xquery.XdbcHelper;
+import com.marklogic.jsptaglib.xquery.common.ResultItem;
 import com.marklogic.xdbc.XDBCException;
 import com.marklogic.xdbc.XDBCResultSequence;
 import com.marklogic.xdbc.XDBCSchemaTypes;
@@ -17,10 +18,8 @@ import java.io.Reader;
 import java.io.StringReader;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ron
- * Date: Jun 16, 2004
- * Time: 5:20:04 PM
+ * Implementation of the ResultItem interface.
+ * @author Ron Hitchens (ron.hitchens@marklogic.com)
  */
 public class ResultItemImpl implements ResultItem
 {
@@ -33,6 +32,12 @@ public class ResultItemImpl implements ResultItem
 
 	// ------------------------------------------------------------
 
+	/**
+	 * Reads and stores the current item from the given ResultSequence.
+	 * @param xdbcResultSequence The source of the data.
+	 * @param index The logical index of this item, relative to others in the sequence.
+	 * @throws XDBCException If there is a problem obtaining the data.
+	 */
 	public ResultItemImpl (XDBCResultSequence xdbcResultSequence, int index)
 		throws XDBCException
 	{
@@ -49,26 +54,43 @@ public class ResultItemImpl implements ResultItem
 
 	// ------------------------------------------------------------
 
-	public int getIndex ()
+	/**
+	 * @return This item's index.
+	 */
+	public int getIndex()
 	{
 		return (index);
 	}
 
+	/**
+	 * @return True if this result item is a Node, false otherwise.
+	 */
 	public boolean isNode()
 	{
 		return (node != null);
 	}
 
+	/**
+	 * @return The value of this result item as a generic Object.
+	 */
 	public Object getObject()
 	{
 		return (object);
 	}
 
+	/**
+	 * @return The value of this result item as a String.
+	 */
 	public String getString()
 	{
 		return ((string != null) ? string : getObject().toString());
 	}
 
+	/**
+	 * @return This result item as a W3C DOM tree.
+	 * @throws XDBCException If there is a problem converting this
+	 *  item to a DOM, or if this item is not a Node.
+	 */
 	public org.w3c.dom.Document getW3cDom() throws XDBCException
 	{
 		if (w3cDom == null) {
@@ -78,6 +100,11 @@ public class ResultItemImpl implements ResultItem
 		return (w3cDom);
 	}
 
+	/**
+	 * @return This result item as a JDom tree.
+	 * @throws XDBCException If there is a problem converting this
+	 *  item to a DOM, or if this item is not a Node.
+	 */
 	public org.jdom.Document getJDom()
 		throws XDBCException
 	{
@@ -88,6 +115,10 @@ public class ResultItemImpl implements ResultItem
 		return (jdom);
 	}
 
+	/**
+	 * @return This item as a Reader.  This implementation uses
+	 *  a StringReader with the getString() value as the source.
+	 */
 	public Reader getReader()
 	{
 		return (new StringReader (getString()));

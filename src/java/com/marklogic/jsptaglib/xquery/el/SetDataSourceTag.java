@@ -12,6 +12,7 @@ import javax.servlet.jsp.JspException;
  * @jsp:tag name="setDataSource" body-content="JSP"
  * description="Set DataSource, Expression Language capable."
  * @see com.marklogic.jsptaglib.xquery.rt.SetDataSourceTag
+ * @author Ron Hitchens (ron.hitchens@marklogic.com)
  */
 public class SetDataSourceTag extends com.marklogic.jsptaglib.xquery.rt.SetDataSourceTag
 {

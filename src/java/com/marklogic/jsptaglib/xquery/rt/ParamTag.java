@@ -13,6 +13,7 @@ import javax.servlet.jsp.tagext.TagSupport;
 /**
  * @jsp:tag name="param"
  *  description="Set named parameter for the query or module invocation"
+ * @author Ron Hitchens (ron.hitchens@marklogic.com)
  */
 public class ParamTag extends BodyTagSupport
 {

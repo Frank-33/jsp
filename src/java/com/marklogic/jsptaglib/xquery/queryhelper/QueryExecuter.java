@@ -12,6 +12,9 @@ import com.marklogic.xdmp.XDMPConnection;
 import org.jdom.*;
 import org.jdom.input.*;
 
+/**
+ * @author Jason Hunter (jason.hunter@marklogic.com)
+ */
 public class QueryExecuter {
   private static final int RETRIES = 10;
   private static final int RETRY_WAIT = 30000;  // ms

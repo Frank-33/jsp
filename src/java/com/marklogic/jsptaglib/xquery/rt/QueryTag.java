@@ -11,6 +11,7 @@ import javax.servlet.jsp.tagext.TagSupport;
 
 /**
  * @jsp:tag name="query" description="Contains XQuery code to be executed"
+ * @author Ron Hitchens (ron.hitchens@marklogic.com)
  */
 public class QueryTag extends BodyTagSupport
 {

@@ -10,6 +10,7 @@ import javax.servlet.jsp.JspException;
 /**
  * @jsp:tag name="user"
  *  description="Set parent attribute to the value of the body of this tag"
+ * @author Ron Hitchens (ron.hitchens@marklogic.com)
  */
 public class UserTag extends com.marklogic.jsptaglib.xquery.rt.UserTag
 {

@@ -31,6 +31,7 @@ import java.io.IOException;
  * the value of the attribute named by 'var'.  If var is not provided, then
  * the value "com.marklogic.jsptaglib.datasource" will be used as a default.
  * The scope attribute is one of page, request, session or application."
+ * @author Ron Hitchens (ron.hitchens@marklogic.com)
  */
  public class SetDataSourceTag extends BodyTagSupport
 	implements ConnectionProperties

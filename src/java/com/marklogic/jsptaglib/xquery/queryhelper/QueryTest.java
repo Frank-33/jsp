@@ -7,6 +7,9 @@ package com.marklogic.jsptaglib.xquery.queryhelper;
 import java.util.logging.*;
 import com.marklogic.xdmp.XDMPConnection;
 
+/**
+ * @author Jason Hunter (jason.hunter@marklogic.com)
+ */
 public class QueryTest {
 
   public static void main(String[] args) throws Exception {

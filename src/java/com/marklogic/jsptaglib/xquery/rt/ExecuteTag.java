@@ -3,7 +3,6 @@
  */
 package com.marklogic.jsptaglib.xquery.rt;
 
-import com.marklogic.jsptaglib.xquery.common.ResultImpl;
 import com.marklogic.jsptaglib.xquery.XdbcHelper;
 import com.marklogic.jsptaglib.AttributeHelper;
 import com.marklogic.xdbc.XDBCConnection;
@@ -22,8 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @jsp:tag name="execute" description="Mark Logic XDBC Statement Tag"
+ * @jsp:tag name="execute" description="Execution context for query"
  *  body-content="JSP"
+ * @author Ron Hitchens (ron.hitchens@marklogic.com)
  */
 public class ExecuteTag extends BodyTagSupport
 	implements TryCatchFinally

@@ -12,6 +12,7 @@ import javax.servlet.jsp.tagext.BodyTagSupport;
 /**
  * @jsp:tag name="password"
  *  description="Set parent attribute to the value of the body of this tag"
+ * @author Ron Hitchens (ron.hitchens@marklogic.com)
  */
 public class PasswordTag extends BodyTagSupport
 {

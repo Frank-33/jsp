@@ -10,6 +10,7 @@ import javax.servlet.jsp.JspException;
 /**
  * @jsp:tag name="streamItem" body-content="empty"
  *  description="Send current element to output as a string"
+ * @author Ron Hitchens (ron.hitchens@marklogic.com)
  */
 public class StreamItemTag extends com.marklogic.jsptaglib.xquery.rt.StreamItemTag
 {

@@ -5,7 +5,6 @@ package com.marklogic.jsptaglib.xquery.rt;
 
 import com.marklogic.jsptaglib.AttributeHelper;
 import com.marklogic.jsptaglib.TagPropertyHelper;
-import com.marklogic.jsptaglib.xquery.common.ResultItemImpl;
 import com.marklogic.xdbc.XDBCException;
 import com.marklogic.xdbc.XDBCResultSequence;
 
@@ -18,8 +17,9 @@ import java.io.IOException;
 import java.io.BufferedReader;
 
 /**
- * @jsp:tag name="result" description="XDBC Result Sequence Tag"
+ * @jsp:tag name="result" description="Invoked once per item in the result"
  *  body-content="JSP"
+ * @author Ron Hitchens (ron.hitchens@marklogic.com)
  */
 public class ResultTag extends BodyTagSupport implements TryCatchFinally
 {
@@ -56,6 +56,8 @@ public class ResultTag extends BodyTagSupport implements TryCatchFinally
 	{
 		this.scope = scope;
 	}
+
+	// -----------------------------------------------------------
 
 	protected BufferedReader getCurrentReader() throws JspException, XDBCException
 	{
@@ -130,7 +132,7 @@ public class ResultTag extends BodyTagSupport implements TryCatchFinally
 				getPreviousOut().write (getBodyContent().getString());
 			}
 		} catch (IOException e) {
-			throw new JspException ("Writing end-tag result: + e", e);
+			throw new JspException ("Writing end-tag result: " + e, e);
 		} finally {
 			try {
 				xdbcResultSequence.close();

@@ -3,6 +3,9 @@
  */
 package com.marklogic.jsptaglib.xquery.queryhelper;
 
+/**
+ * @author Jason Hunter (jason.hunter@marklogic.com)
+ */
 public class Query {
 
   public static final int STRING = 0;

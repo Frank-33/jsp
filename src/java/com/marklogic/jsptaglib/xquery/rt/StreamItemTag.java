@@ -16,6 +16,7 @@ import java.io.Reader;
 /**
  * @jsp:tag name="streamItem" body-content="empty"
  *  description="Send current element to output as a string"
+ * @author Ron Hitchens (ron.hitchens@marklogic.com)
  */
 public class StreamItemTag extends BodyTagSupport
 {

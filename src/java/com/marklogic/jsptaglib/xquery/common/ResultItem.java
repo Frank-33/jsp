@@ -8,8 +8,9 @@ import com.marklogic.xdbc.XDBCException;
 import java.io.Reader;
 
 /**
- * One of the result elements in a sequence returned by
+ * One of the result items in a sequence returned by
  * the execution of an XQuery script.
+ * @author Ron Hitchens (ron.hitchens@marklogic.com)
  */
 public interface ResultItem
 {

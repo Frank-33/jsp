@@ -4,14 +4,13 @@
 package com.marklogic.jsptaglib.xquery.common;
 
 /**
- * An instance of this class is set in as the result of
- * an XQuery call by the xq:query tag.  This object is a
+ * An instance of this class is set as the result of
+ * an XQuery call by the xq:execute tag.  This object is a
  * simple container that holds the returned result sequence.
  * The result sequence held here is fully memory resident
- * and no longer bound to a connection.  This implies that
- * streaming results are not possible with the xq:query tag.
- * If you need streaming, see the xq:statement and
- * xq:resultSequence tags.
+ * and no longer bound to a connection.  The result items
+ * may be accessed randomly and/or repeatedly as needed.
+ * @author Ron Hitchens (ron.hitchens@marklogic.com)
  */
 public interface Result
 {
@@ -23,12 +22,12 @@ public interface Result
 	/**
 	 * @return The full sequence of results as an array.
 	 */
-	ResultItem [] getItem();
+	ResultItem [] getItems();
 
 	/**
 	 * @param index The index of the ResultItem object to return, the first
 	 * is zero.
 	 * @return The ResultItem object at the requested index.
 	 */
-	ResultItem getResult (int index);
+	ResultItem getItem (int index);
 }

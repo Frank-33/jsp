@@ -10,6 +10,7 @@ import com.marklogic.xdbc.XDBCConnection;
 /**
  * Wrapper for the XDMPDataSource class which associates default user/password
  * values with connections requests that don't specify them.
+ * @author Ron Hitchens (ron.hitchens@marklogic.com)
  */
 public class XdmpDataSourceWrapper extends XDMPDataSource
 {

@@ -10,8 +10,9 @@ import org.apache.taglibs.standard.lang.support.ExpressionEvaluatorManager;
 import javax.servlet.jsp.JspException;
 
 /**
- * @jsp:tag name="execute" description="Statement Tag, Expression Language enabled"
+ * @jsp:tag name="execute" description="Execution context for query"
  *  body-content="JSP"
+ * @author Ron Hitchens (ron.hitchens@marklogic.com)
  */
 public class ExecuteTag extends com.marklogic.jsptaglib.xquery.rt.ExecuteTag
 {

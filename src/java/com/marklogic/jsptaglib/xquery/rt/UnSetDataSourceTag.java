@@ -17,6 +17,7 @@ import javax.servlet.jsp.tagext.TagSupport;
  *  in that scope will be cleared.  Otherwise the default
  *  PageContext search will be applied.  This tag is generally
  *  only useful for session and application scope."
+ * @author Ron Hitchens (ron.hitchens@marklogic.com)
  */
 public class UnSetDataSourceTag extends TagSupport
 {

@@ -8,8 +8,9 @@ import org.apache.taglibs.standard.lang.support.ExpressionEvaluatorManager;
 import javax.servlet.jsp.JspException;
 
 /**
- * @jsp:tag name="result" description="XDBC Result Sequence Tag"
+ * @jsp:tag name="result" description="Invoked once per item in the result"
  *  body-content="JSP"
+ * @author Ron Hitchens (ron.hitchens@marklogic.com)
  */
 public class ResultTag extends com.marklogic.jsptaglib.xquery.rt.ResultTag
 {

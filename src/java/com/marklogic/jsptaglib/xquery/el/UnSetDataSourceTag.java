@@ -10,8 +10,14 @@ import javax.servlet.jsp.JspException;
 
 /**
  * @jsp:tag name="unSetDataSource" body-content="empty"
- *  description="Unset DataSource, Expression Language capable."
- * @see com.marklogic.jsptaglib.xquery.rt.UnSetDataSourceTag
+ *  description="Clear a datasource attribute.  If a variable
+ *  name is provided, that variable will be cleared.  If
+ *  no name is given, the default name used by setDataSource
+ *  will be cleared.  If a scope is provided, the attribute
+ *  in that scope will be cleared.  Otherwise the default
+ *  PageContext search will be applied.  This tag is generally
+ *  only useful for session and application scope."
+ * @author Ron Hitchens (ron.hitchens@marklogic.com)
  */
 public class UnSetDataSourceTag extends com.marklogic.jsptaglib.xquery.rt.UnSetDataSourceTag
 {
