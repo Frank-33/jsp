@@ -20,9 +20,9 @@ package com.marklogic.jsptaglib.xquery.rt;
 
 import com.marklogic.jsptaglib.AttributeHelper;
 import com.marklogic.jsptaglib.TagPropertyHelper;
-import com.marklogic.jsptaglib.xquery.common.Result;
 import com.marklogic.xqrunner.XQException;
 import com.marklogic.xqrunner.XQResult;
+import com.marklogic.xqrunner.XQResultItem;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyTagSupport;
@@ -42,8 +42,8 @@ public class ResultTag extends BodyTagSupport implements TryCatchFinally
 	private String var = null;
 	private String scope = null;
 
-	private Result result = null;
-	private int index = 0;
+	private XQResult result = null;
+	private XQResultItem currentItem = null;
 	private boolean readerFetched = false;
 
 	// -----------------------------------------------------------
@@ -53,7 +53,7 @@ public class ResultTag extends BodyTagSupport implements TryCatchFinally
 		var = null;
 		scope = null;
 		result = null;
-		index = 0;
+		currentItem = null;
 		readerFetched = false;
 	}
 
@@ -87,7 +87,11 @@ public class ResultTag extends BodyTagSupport implements TryCatchFinally
 
 		readerFetched = true;
 
-		return result.getItem (index).getReader();
+		try {
+			return currentItem.asReader();
+		} catch (XQException e) {
+			throw new JspException ("Marshalling item value as Reader: " + e, e);
+		}
 	}
 
 	// -----------------------------------------------------------
@@ -105,17 +109,15 @@ public class ResultTag extends BodyTagSupport implements TryCatchFinally
 		try {
 			ExecuteTag executeTag = (ExecuteTag) findAncestorWithClass (this, ExecuteTag.class);
 
-			XQResult xqResult = executeTag.executeQuery();
-
-			if (xqResult.getSize () == 0) {
-				return SKIP_BODY;
+			if (var == null) {
+				result = executeTag.executeQueryStreaming();
+			} else {
+				result = executeTag.executeQuery();
 			}
 
-			result = new ResultAdapter (xqResult);
-
-			index = 0;
-
-			setupNextItem (result, index);
+			if ( ! setupNextItem()) {
+				return SKIP_BODY;
+			}
 		} catch (XQException e) {
 			throw new JspException ("Executing query: " + e, e);
 		}
@@ -125,12 +127,12 @@ public class ResultTag extends BodyTagSupport implements TryCatchFinally
 
 	public int doAfterBody() throws JspException
 	{
-		index++;
-
-		if (index < result.getSize()) {
-			setupNextItem (result, index);
-
-			return EVAL_BODY_BUFFERED;
+		try {
+			if (setupNextItem()) {
+				return EVAL_BODY_BUFFERED;
+			}
+		} catch (XQException e) {
+			throw new JspException ("Marshalling next item value: " + e, e);
 		}
 
 		return EVAL_PAGE;
@@ -161,14 +163,21 @@ public class ResultTag extends BodyTagSupport implements TryCatchFinally
 
 	// -----------------------------------------------------------
 
-	private void setupNextItem (Result result, int index)
+	private boolean setupNextItem() throws XQException
 	{
-		if (var == null) {
-			readerFetched = false;
-		} else {
-			AttributeHelper.setScopedAttribute (pageContext, var,
-				result.getItem (index), scope);
+		readerFetched = false;
+		currentItem = result.nextItem();
+
+		if (currentItem == null) {
+			return (false);
 		}
+
+		if (var != null) {
+			AttributeHelper.setScopedAttribute (pageContext, var,
+				new ResultItemAdapter (currentItem), scope);
+		}
+
+		return (true);
 	}
 
 	// -----------------------------------------------------------

@@ -37,12 +37,12 @@ public interface Result
 	/**
 	 * @return The full sequence of results as an array.
 	 */
-	ResultItem [] getItems();
+	ResultItem [] getItems() throws ResultException;
 
 	/**
 	 * @param index The index of the ResultItem object to return, the first
 	 * is zero.
 	 * @return The ResultItem object at the requested index.
 	 */
-	ResultItem getItem (int index);
+	ResultItem getItem (int index) throws ResultException;
 }

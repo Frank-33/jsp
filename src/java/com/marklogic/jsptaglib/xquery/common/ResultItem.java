@@ -18,6 +18,8 @@
  */
 package com.marklogic.jsptaglib.xquery.common;
 
+import com.marklogic.xqrunner.XQException;
+
 import java.io.Reader;
 
 /**
@@ -75,5 +77,5 @@ public interface ResultItem
 	 *  result item can be read.  This a StringReader instance over
 	 *  the return value of getString().
 	 */
-	Reader getReader();
+	Reader getReader() throws XQException;
 }

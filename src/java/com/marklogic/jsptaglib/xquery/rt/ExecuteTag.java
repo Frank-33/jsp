@@ -136,6 +136,18 @@ public class ExecuteTag extends BodyTagSupport
 	public XQResult executeQuery ()
 		throws XQException
 	{
+		return (doExecuteQuery (false));
+	}
+
+	public XQResult executeQueryStreaming ()
+		throws XQException
+	{
+		return (doExecuteQuery (true));
+	}
+
+	private XQResult doExecuteQuery (boolean streaming)
+		throws XQException
+	{
 		// TODO: Handle "module" attribute being set instead of "query"
 
 		XQuery xquery = dataSource.newQuery (query);
@@ -148,7 +160,11 @@ public class ExecuteTag extends BodyTagSupport
 
 		XQRunner runner = dataSource.newSyncRunner();
 
-		return (runner.runQuery (xquery));
+		if (streaming) {
+			return (runner.runQueryStreaming (xquery));
+		} else {
+			return (runner.runQuery (xquery));
+		}
 	}
 
 	// ------------------------------------------------------------------------
@@ -198,13 +214,10 @@ public class ExecuteTag extends BodyTagSupport
 		}
 
 		try {
-
-			XQResult result = executeQuery();
-
 			if (var == null) {
-				outputResult (result, separator);
+				outputResult (executeQueryStreaming(), separator);
 			} else {
-				setResult (result, var);
+				setResult (executeQuery(), var);
 			}
 		} catch (XQException e) {
 			throw new JspException ("executing query: " + e, e);
@@ -227,10 +240,11 @@ public class ExecuteTag extends BodyTagSupport
 		throws JspException
 	{
 		try {
-			// FIXME: make this streaming: result.writeTo (Writer writer)
-			pageContext.getOut().write (result.asString (separator));
+			result.writeTo (pageContext.getOut(), (separator == null) ? "" : separator);
 		} catch (IOException e) {
 			throw new JspException ("writing result: " + e, e);
+		} catch (XQException e) {
+			throw new JspException ("fetching result: " + e, e);
 		}
 	}
 

@@ -18,12 +18,10 @@
  */
 package com.marklogic.jsptaglib.xquery.rt;
 
-import com.marklogic.jsptaglib.xquery.common.Result;
-import com.marklogic.jsptaglib.xquery.common.ResultException;
 import com.marklogic.jsptaglib.xquery.common.ResultItem;
-import com.marklogic.xqrunner.XQException;
-import com.marklogic.xqrunner.XQResult;
+import com.marklogic.jsptaglib.xquery.common.ResultException;
 import com.marklogic.xqrunner.XQResultItem;
+import com.marklogic.xqrunner.XQException;
 
 import org.w3c.dom.Document;
 
@@ -32,44 +30,58 @@ import java.io.Reader;
 /**
  * Created by IntelliJ IDEA.
  * User: ron
- * Date: Nov 3, 2004
- * Time: 3:35:45 PM
+ * Date: Nov 11, 2004
+ * Time: 4:55:33 PM
  */
-public class ResultAdapter implements Result
+class ResultItemAdapter implements ResultItem
 {
-	private XQResult result;
+	private XQResultItem item;
 
-	public ResultAdapter (XQResult result)
+	public ResultItemAdapter (XQResultItem item)
 	{
-		this.result = result;
+		this.item = item;
 	}
 
-	public int getSize ()
+	public int getIndex()
 	{
-		return (result.getSize());
+		return (item.getIndex());
 	}
 
-	public ResultItem[] getItems () throws ResultException
+	public boolean isNode()
 	{
-		ResultItem [] items = new ResultItem [result.getSize()];
-
-		for (int i = 0; i < items.length; i++) {
-			try {
-				items [i] = new ResultItemAdapter (result.getItem (i));
-			} catch (XQException e) {
-				throw new ResultException (e.getMessage(), e);
-			}
-		}
-
-		return (items);
+		return (item.isNode());
 	}
 
-	public ResultItem getItem (int index) throws ResultException
+	public Object getObject()
+	{
+		return (item.asObject());
+	}
+
+	public String getString()
+	{
+		return (item.asString());
+	}
+
+	public Document getW3cDom() throws ResultException
 	{
 		try {
-			return (new ResultItemAdapter (result.getItem (index)));
+			return (item.asW3cDom());
 		} catch (XQException e) {
 			throw new ResultException (e.getMessage(), e);
 		}
+	}
+
+	public org.jdom.Document getJDom() throws ResultException
+	{
+		try {
+			return (item.asJDom());
+		} catch (XQException e) {
+			throw new ResultException (e.getMessage(), e);
+		}
+	}
+
+	public Reader getReader() throws XQException
+	{
+		return (item.asReader());
 	}
 }
