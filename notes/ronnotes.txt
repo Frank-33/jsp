@@ -1,18 +1,43 @@
 
-<xq:setDataSource id="foo" scope="page|request|session|application"
+# specify data source with attributes alone.  Var is optional, will use default
+<xq:setDataSource var="foo" scope="page|request|session|application"
 	host="hostname" port="1234" user="joe" password="secret"
 	dataSource="java:com/env/xdbc/server" />
 
-<xq:setDataSource id="foo" scope="page|request|session|application">
+# specify data source with child elements
+<xq:setDataSource var="foo" scope="page|request|session|application">
 	<xq:host>hostname</xq:host>
 	<xq:port>1234</xq:port>
-	<xq:user>joe</xq:user>
-	<xq:password>joe</xq:password>
+	<xq:user>fred</xq:user>
+	<xq:password>secret</xq:password>
 	<xq:dataSource>java:com/env/xdbc/server</xq:dataSource>
 </xq:dataSource>
 
-<xq:unSetDataSource/>
+# specify data source with child elements naming web.xml config params
+<xq:setDataSource var="foo" scope="page|request|session|application">
+	<xq:host initParameter="cishost"/>
+	<xq:port initParameter="cisport"/>
+	<xq:user initParameter="cisuser"/>
+	<xq:password initParameter="cispasswd"/>
+	<xq:dataSource initParameter="cisdatasource"/>
+</xq:dataSource>
 
+# Clear datasource, using default name if not specified
+<xq:unSetDataSource var="foo" scope="page|request|session|application"/>
+
+# Run a query, set result (ResultSequence) in "var".  DataSource name optional
+# Query specified as an attribute.
+<xq:query var="resultseq" dataSource="ds" separator="|" query="..."/>
+
+# Run a query, set result (ResultSequence) in "var".  DataSource name optional
+# Query specified given as the tag body, with embedded xq:escape tags
+<xq:query dataSource="ds" separator="|" importModule="" importModuleNamespace="">
+	...<xq:escape>something literal</xq:escape>...
+	...<xq:escape escapeChars="()&">something else literal</xq:escape>...
+</xq:query>
+
+# Streaming, iterating query using statement/resultSequence tags
+# Body of xq:resultSequence runs once for each result in the sequence
 <xq:statement var="blah" dataSource="foo">
 	<xq:query importModule="blah.xqy" importModuleNamespace="blither">
 		for ...
@@ -35,15 +60,9 @@
 	</xq:resultSequence>
 </xq:statement>
 
-<xq:query var="resultseq" dataSource="ds" separator="|" query="..."/>
-
-<xq:query dataSource="ds" separator="|" importModule="" importModuleNamespace="">
-	...<xq:escape>something literal</xq:escape>...
-	...<xq:escape escapeChars="()&">something else literal</xq:escape>...
-</xq:query>
-
 ---
 
+# An instance of this is set in "var" by the xq:query tag
 public interface ResultSequence
 {
 	int getSize();
@@ -59,25 +78,3 @@ public interface Result
 	org.w3c.dom.Document getW3cDom() throws XDBCException;
 	org.jdom.Document getJDom() throws XDBCException;
 }
-
-------------------
-deprecated
-
-<xq:statement dataSource="foo">
-	<xq:query importModule="blah.xqy" importModuleNamespace="blither">
-		for ...
-		let ...
-		return ...
-	</xq:query>
-	<xq:execute separator="..." ignoreResult="true|false" ignoreErrors="true|false"/>
-</xq:statement>
-
-<xq:statement dataSource="foo">
-	<xq:query importModule="blah.xqy" importModuleNamespace="blither">
-		for ...
-		let ...
-		return ...
-	</xq:query>
-	<xq:setResult id="attr-to-set-result-to" firstOnly="true|false" ignoreErrors="true|false"/>
-</xq:statement>
-
