@@ -1,4 +1,4 @@
-<project name="j2ee" default="all" basedir=".">
+<project name="jsptags" default="all" basedir=".">
 
 	<!-- Static definitions of where things are relative to the root -->
 	<property name="java.source" value="src/java"/>
