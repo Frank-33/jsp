@@ -3,15 +3,17 @@
 <html>
 <head>
 <title>Test QuickQuery 2</title>
+<link rel="stylesheet" href="/jsp.css" media="screen" />
 </head>
 <body style="Font-family:arial,helvetica,san-serif;">
-<div align="center">
+<div id="header"><h1>Documents In The Server</h1></div>
+<div id="main">
 <xq:execute>
 	<xq:query>
 		for $n in input() return xdmp:node-uri($n)
 	</xq:query>
 
-	<table align="center" border="1" cellpadding="2">
+	<table align="center" border="1" cellpadding="3" cellspacing="0">
 	<tr><th>Document URI</th><th colspan="3">Display As</th></tr>
 	<xq:result var="item">
 	<tr>
@@ -23,8 +25,6 @@
 	</xq:result>
 	</table>
 </xq:execute>
-<br>
-<br>
 <form action="/"><input type="submit" value="Go Home"></form>
 </div>
 </body>

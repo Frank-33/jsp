@@ -3,9 +3,10 @@
 <html>
 <head>
 <title>Test QuickQuery 2</title>
+<link rel="stylesheet" href="/jsp.css" media="screen" />
 </head>
 <body style="Font-family:arial,helvetica,san-serif;">
-<div align="center">
+<div id="main">
 <xq:execute>
 	<xq:query>
 		<b>This is the result of a remote xquery</b>,

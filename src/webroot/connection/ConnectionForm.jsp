@@ -4,22 +4,21 @@
 <c:choose>
 <c:when test="${param.posting != 'true'}">
 <html>
-<head><title>Connection Parameters</title></head>
+<head><title>Connection Parameters</title>
+<link rel="stylesheet" href="/jsp.css" media="screen" />
+</head>
 <body>
-<br>
-<div align="center">
-Please provide connection information for the CIS server
-<br>
-<br>
-<form>
-Host: <input type="text" name="host"><br>
-Port: <input type="text" name="port"><br>
-User: <input type="text" name="user"><br>
-Pass: <input type="text" name="pass"><br>
-<input type="hidden" name="posting" value="true">
-<br>
-<input type="submit" value="Set Connection DataSource">
-</form>
+<div id="header"><h1>Please provide connection information for the CIS server</h1></div>
+<div id="main">
+	<form>
+	Host: <input type="text" name="host"><br>
+	Port: <input type="text" name="port"><br>
+	User: <input type="text" name="user"><br>
+	Pass: <input type="text" name="pass"><br>
+	<input type="hidden" name="posting" value="true">
+	<br>
+	<input type="submit" value="Set Connection DataSource">
+	</form>
 </div>
 </body>
 </html>

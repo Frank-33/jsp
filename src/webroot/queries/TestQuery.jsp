@@ -3,9 +3,11 @@
 <html>
 <head>
 <title>Run XQuery, Iterate Over Result</title>
+<link rel="stylesheet" href="/jsp.css" media="screen" />
 </head>
 <body style="Font-family:arial,helvetica,san-serif;">
-<div align="center">
+<div id="header"><h1>Self-Contained Test Query</h1></div>
+<div id="main">
 <xq:execute var="result">
 	<xq:query>
 		<b>This is an xquery body</b>, <i>And this is another</i>,
@@ -13,7 +15,7 @@
 		123.00, "Bamboozle", <span>Bamboozle</span>, doc("/tmp/test.xml")
 	</xq:query>
 </xq:execute>
-<table border="1" cellpadding="3" cellspacing="0">
+<table align="center" border="1" cellpadding="3" cellspacing="0">
 	<tr style="color:white;background-color:black;"><th>Index</th><th>Value</th><th>Node?</th></tr>
 	<c:forEach var="item" items="${result.items}" varStatus="status" >
 		<tr>
@@ -27,8 +29,6 @@
 	</c:forEach>
 </table>
 
-<br>
-<br>
 <form action="/"><input type="submit" value="Go Home"></form>
 </div>
 </body>
