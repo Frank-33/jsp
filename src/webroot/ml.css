@@ -1,0 +1,440 @@
+/*
+Stylesheet for Mark Logic Developer Community Website
+*/
+
+/***********************************/
+/*          GLOBAL FUN             */
+/***********************************/
+body {
+	margin: 0px;
+	padding: 0px;
+	background-color: #70562F;
+	/* text-align: center; */
+	/*Change global font size here!!*/
+    /*font-size: 10pt;*/
+    font-size: 80%;
+	}
+
+
+/***********************************/
+/*           BODY MARKUP           */
+/***********************************/
+#page {
+	width: 740px;
+    margin-left: 30px;
+    margin-right: auto;
+	background-color: #fff;
+	text-align: left;
+    margin-top: 0px;
+    padding: 0px;
+    border-right: 7px solid #990033;
+    border-left: 7px solid #990033;
+    border-bottom: 7px solid #990033;
+	}
+
+/***********************************/
+/*         HEADER MARKUP           */
+/***********************************/
+#printhead {
+	display: none;
+	}
+
+#header {
+	width: 740px;
+	background-color: #D5A255;
+	text-align: right;
+    margin-top: 0px;
+    padding-top: 0px;
+    padding-bottom: 5px;
+    padding-right: 0px;
+	}
+	
+#header img {
+    padding: 0px;
+    }
+
+
+
+
+/***********************************/
+/*       NAVIGATION MARKUP         */
+/***********************************/
+
+#nav {
+
+	width: 740px;
+	clear: both;
+	text-align: left;
+	background-color: #D5A255; 
+	padding-top: 5px;
+	/*Commented Backslash Hack (v.2) hides 
+	rule from IE5-Mac, documented at 
+	http://www.sam-i-am.com/work/sandbox/css/mac_ie5_hack.html \*/
+	height: 19px !important;
+	height: 22px; 
+	/*end hack */
+	/*!important hides from recent IE, documented at 
+	http://www.dithered.com/css_filters/css_only/important_property.html */
+    /*padding-left: 22px;*/
+    border-bottom: 5px solid #E0DDC1; 
+	}
+
+#nav ul {
+	margin: 0;
+    margin-left: 25px;
+	padding: 0;
+	list-style-type: none;
+	}
+
+#nav li {
+	display: inline;
+	margin: 0;
+	text-align: center;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 0.9em;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    
+    /*
+    border-top: 1px solid #796F66;
+    border-right: 1px solid #796F66;
+    border-left: 1px solid #796F66;
+    border-bottom: 2px solid #A3895F; */
+    
+
+    margin-left: 2px;
+    text-shadow: 3px 3px 3px #555;
+	}
+
+#nav li#home {
+	margin-left: 4px;
+	}
+
+#nav li a {
+	padding: 4px 8px; 
+	color: #FFF;  
+	text-decoration: none;
+	font-weight: bold;
+	}
+
+body.home #nav li#home a,
+body.news #nav li#news a, 
+body.code #nav li#code a,
+body.download #nav li#download a,
+body.faq #nav li#faq a,
+body.howto #nav li#howto a,
+body.discuss #nav li#discuss a {
+	padding: 4px 8px;
+	background-color:#E0DDC1;
+	color: #000;
+	text-decoration: none;
+	font-weight: bold;
+    border-bottom: 1px solid #E0DDC1;
+    border-top: 1px solid #B0AA90;
+    border-right: 1px solid #A09980;
+    border-left: 1px solid #C0BBA0;
+	}
+
+body.home #nav li#home {
+	margin-left: 0;
+	}
+
+body.home #nav li#home a {
+    /* border-left: #F1F0ED; */
+}
+
+#nav li a:hover {
+	text-decoration: underline;
+	color: #FFF;
+	}
+
+
+/***SEARCH */
+
+
+#search {
+	/*float: right;*/
+	}
+
+
+
+/***********************************/
+/*       MAIN BODY STUFF           */
+/***********************************/
+#main {
+	width: 740px;
+	border-top: 1px solid #E2DDC2;
+    margin: 0px;
+    padding: 0px;
+	}
+
+
+#body {
+    width: 500px; 
+    float: left;
+    margin-left: 25px;
+    padding-bottom: 0px;
+}
+
+/**** FONTOLOGY ***/
+
+#main h1 {
+	font-family: Arial, Helvetica, sans-serif;
+    font-size: 1.4em;
+	color: #903;
+	font-weight: bold;
+	margin: 30px 0 10px 0;
+	padding: 0 10px 0 0;
+	border-bottom: 1px solid #ccc;
+
+	}
+
+#main h2 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 1.2em; 
+	font-weight: bold;
+	color: #1B2F4A; /*#258;*/
+	margin: 10px 0 3px 0;
+	}
+
+#main p {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	line-height: 1.4em;
+	margin: 0 20px 15px 0;
+	}
+
+#main a {
+	color: #339;
+	text-decoration: underline;
+	}
+
+#main h1 a {
+    text-decoration: none;
+    color: #903;
+}
+
+#main h2 a {
+    text-decoration: none;
+    color: #1B2F4A;
+}
+
+#main a:hover {
+	color: #00F;
+	text-decoration: underline;
+	}
+    
+
+
+#main a.big {
+	font-weight: bold;
+	}
+	
+#main dl {
+    margin: 20px 40px 20px 2px;
+    }
+
+/**** STRUCTURAL ELEMENTS ***/
+
+#main dt {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: bold;
+	/* font-size: 1.1em; */ /*12px*/
+	/* line-height: 1.4em; */
+	margin: 10px 20px 0px 0px;
+	}
+
+#main dd {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+	/* font-size: 1.0em; *//*12px*/
+	/* line-height: 1.4em; */
+	margin: 2px 0px 5px 20px;
+    }
+
+#main ol, 
+#main ul {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	/* font-size: 1.1em; *//*12px*/
+	line-height: 1.4em;
+	/* list-style-type: none; */
+	margin: 0px 0px 10px 25px;
+	padding: 0;
+	}
+
+#main li {
+    margin: 5px 0;
+    }
+
+#main blockquote {
+    background: #DDD;
+    padding: 10px;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+	/* font-size: 1.0em; */
+    }
+/*
+#mail ol img,
+#mail ul img {
+	float: none;
+	}
+*/
+#main ul.referencelist {
+	/* font-size: 1.1em; *//*12px*/
+	line-height: 1.4em;
+	list-style-type: none; 
+	margin: 0px 0px 10px 25px;
+    }
+
+/**** SPECIFIC ELEMENTS ****/
+
+#main img.fileicon {
+    float: left;
+    margin-right: 5px;
+    }
+
+#main img.bug {
+    padding: 5px;
+}
+
+
+/***********************************/
+/*       SIDEBAR STUFF             */
+/***********************************/
+
+#sidebar {
+	float: right;
+	width: 160px;
+	font-family:Verdana, Arial, Helvetica, sans-serif;
+	font-size: 0.85em;
+	color: #333;
+    text-align: right;
+    margin: 0px;
+    margin-right: 20px;
+	}
+
+#sidebar a:link, #sidebar a:visited {
+    text-decoration: none;
+}
+
+#sidebar a:hover {
+    text-decoration: underline;
+    color: #33A;
+}
+
+#search {
+    text-align: right;
+    margin-top: 10px;
+    margin-bottom: 10px;
+	padding-top: 10px;
+    padding-bottom: 10px;
+} 
+
+#sidedownload {
+    text-align: right;
+    margin-top: 10px;
+    margin-bottom: 10px;
+	padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+#sidebar ul {
+	list-style-type: none;
+    text-align: right;
+    margin-top: 10px;
+    margin-bottom: 10px;
+	padding-top: 10px;
+    padding-bottom: 10px;
+	}
+
+#sidebar li {
+    list-style-type: none;
+    margin: 0;
+    }
+
+#sidebar img {
+	margin: auto;
+	float: none;
+	}
+
+/*************   AD   ************/
+
+#ad {
+	/* text-align: center; */
+	padding-top: 20px;
+	color: #999;
+	}
+
+#ad p {
+	/* font-size: 1em; */
+	margin: 0;
+	padding: 0;
+	}
+
+#ad img {
+	margin: auto;
+	float: none;
+	}
+
+/***********************************/
+/*       FOOTER FUN                */
+/***********************************/
+
+#footer {
+	border-top: 5px solid #E0DDC1;
+    border-right: none;
+    border-bottom: none;
+    border-left: none;
+	width: 740px;
+	background-color: #D5A255; /* #ddd;*/
+	clear: both;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	color: #333;
+	font-size: 0.8em;
+    padding: 0px;
+    footer: 0px;
+    padding-bottom: 8px;
+    padding-top: 10px;
+	}
+
+#footer div {
+    margin-right: 25px;
+    margin-left: 25px;
+    }
+
+#footer ul {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+	}
+
+
+#footer li {
+	display: inline;
+	margin: 0;
+	text-align: center;
+	border-left: 1px solid #666;
+	padding: 0 5px 0 5px;
+	}
+	
+#footer li#first {
+	border: none;
+	padding-left: 0;
+	}
+
+#footer #poweredby {
+	color: #555;
+	float: right;
+	margin-right: 20px;
+}
+
+
+#maillisttable {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 0.8em;
+	border: 1px solid #555;
+}
+
+#calendartable {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 0.9em;
+}
+
+
