@@ -1,13 +1,14 @@
 <project>
 
   <!-- the name of the project -->
-  <name>Mark Logic JSP tag library</name>
+  <name>Mark Logic ZQuery JSP Tag Library</name>
 
-  <!-- a short description of the project. This description 
+  <!-- a short description of the project. This description
   will be used on the main site pages. No markup in here
   please. Just plain text -->
   <abstract>
-  A tag library allowing JSP pages to access Mark Logic CIS
+The Mark Logic XQuery JSP Tag Library enables JSP pages
+running in a J2EE container to issue queries to CIS and receive the result.
   </abstract>
 
   <!-- there can be 0 to many notify tags. Each tag contains an

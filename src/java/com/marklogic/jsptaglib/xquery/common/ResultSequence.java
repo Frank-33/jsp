@@ -4,14 +4,31 @@
 package com.marklogic.jsptaglib.xquery.common;
 
 /**
- * Created by IntelliJ IDEA.
- * User: ron
- * Date: May 13, 2004
- * Time: 11:58:04 AM
+ * An instance of this class is set in as the result of
+ * an XQuery call by the xq:query tag.  This object is a
+ * simple container that holds the returned result sequence.
+ * The result sequence held here is fully memory resident
+ * and no longer bound to a connection.  This implies that
+ * streaming results are not possible with the xq:query tag.
+ * If you need streaming, see the xq:statement and
+ * xq:resultSequence tags.
  */
 public interface ResultSequence
 {
+	/**
+	 * @return The number of Result elements the sequence.
+	 */
 	int getSize();
+
+	/**
+	 * @return The full sequence of results as an array.
+	 */
 	Result [] getSequence();
+
+	/**
+	 * @param index The index of the Result object to return, the first
+	 * is zero.
+	 * @return The Result object at the requested index.
+	 */
 	Result getResult (int index);
 }
