@@ -1,0 +1,508 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+    <head>
+        <title>JSP Tutorial</title>
+<style>
+	body {
+		font-family: Verdana, Arial, Helvetica, sans-serif;
+		font-size: 85%;
+	}
+
+	pre {
+		border: 1px solid black;
+		background-color: #ddd;
+		margin: 3px;
+		padding: 5px;
+	}
+
+	#sampleul {
+		background-color: #eee;
+		border: 1px solid blank;
+		margin: 3px;
+		padding: 5px
+	}
+</style>
+
+    </head>
+
+    <body xml:space="preserve">
+
+        <div align="center"><h1>Using The Mark Logic XQuery JSP Tag Library</h1></div>
+
+        <p>This tutorial will show you how to use the Mark Logic Java Server
+        Pages (JSP) Tag Library to access a Content Interaction Server engine
+        from within a J2EE web application. The Mark Logic tag library will
+        work with any JSP container such as <a
+        href="http://jakarta.apache.org/tomcat/">Tomcat</a> or <a
+        href="Jetty">Jetty</a>, as well as EJB application servers like <a
+        href="http://www.bea.com/framework.jsp?CNT=index.htm&amp;FP=/content/products/server/">WebLogic</a>,
+        <a href="http://www.ibm.com/software/info1/websphere/">WebSphere</a>
+        or <a href="http://jboss.org/">JBoss</a>.</p>
+
+        <p>The following assumes that you are familiar with Java, Java
+        Servlets and JSP, and that you understand how to build and deploy J2EE
+        web applications.</p>
+
+        <h2>Introduction</h2>
+
+        <p>While Mark Logic Content Interaction Server is unique in many ways,
+        the role it plays in the IT ecosystem is typically that of
+        <i>datasource</i>, a generic name for a system component that stores
+        and retrieves data.</p>
+
+        <p>Content Interaction Server includes a builtin HTTP server which is
+        sufficient to execute XQuery scripts and output HTML directly to the
+        user's browser. But there may be cases where it's preferable to access
+        content from within a web application that's running in a J2EE
+        container. Reasons for this could include combining the result with
+        data from other datasources, further processing the result to apply
+        business rules written in Java, generating XQuery scripts dynamically
+        at runtime from session-specific information, etc.</p>
+
+        <p>Content Interaction Server comes bundled with a Java connectivity
+        package called XDBC that is modeled after the standard JDBC package.
+        It provides a connection-oriented mechanism by which Java code can
+        issue queries to a server and receive the results over the
+        network.</p>
+
+        <p>The JSP Tag Library is built on top of XDBC and simplifies J2EE
+        integration by interfacing to a Content Interaction Server using only
+        standard JSP tag syntax.. It's open source and available free of
+        charge from the <b>xq:zone</b> developer website at <a
+        href="http://xqzone.marklogic.com/code/">http://xqzone.marklogic.com</a>.
+        The code is made available under the Apache 2.0 license.</p>
+
+        <h2>Custom JSP Tag Libraries</h2>
+
+        <p>The Mark Logic JSP tags are modeled after the <a
+        href="http://java.sun.com/products/jsp/jstl/">Java Standard Tag
+        Library (JSTL)</a> both to respect the prevailing conventions and to
+        make it easier to inter-operate with the JSTL tags. The tags in the
+        SQL component of the JSTL were the direct inspiration for the Mark
+        Logic tags. They are similar in design philosophy but vary in
+        significant ways.</p>
+
+        <p>To get started, let's look at how custom JSP tags are hooked into a
+        web application and then we'll look at some usage examples.</p>
+
+        <p>A custom JSP tag library consists of a set of Java classes, usually
+        packaged into a Java Archive (JAR) file, and a descriptor file that
+        tells the JSP container how those classes map to individual tags in a
+        JSP page. The Java classes are written against the appropriate J2EE
+        tag APIs and are the code that is invoked when those custom tags are
+        processed by the JSP container.</p>
+
+        <p>The container maps tags encountered in a JSP to specific classes by
+        means of a Template Library Definition (TLD) file. The TLD contains
+        information about the tag syntax, such as which attributes are
+        allowed, and the names of the implementing Java classes.</p>
+
+        <p>The TLD for a custom tag library (there may be multiple tag
+        libraries in use at once) is named in a web application's
+        <code>web.xml</code> file which is the overall descriptor for a web
+        application.</p>
+
+        <p>Working backwards now, you need to add a clause like this to your
+        project's <code>web.xml</code>, so the container can find the TLD:</p>
+
+        <pre><code>&lt;taglib&gt;
+    &lt;taglib-uri&gt;http://marklogic.com/jsp/taglib&lt;/taglib-uri&gt;
+    &lt;taglib-location&gt;/WEB-INF/taglib/marklogicxquery.tld&lt;/taglib-location&gt;
+&lt;/taglib&gt;</code></pre>
+
+        <p>This defines a URI which identifies the TLD to the container when
+        that URI is referenced in a JSP. This URI is arbitrary -- it need not
+        be a real web address -- it's only used as a unique identifier string.
+        The second item is the path, relative to the web application, of the
+        actual TLD descriptor file.</p>
+
+        <p>Place the TLD (included in the Mark Logic JSP distribution) under
+        the <code>WEB-INF</code> directory at indicated path. It can go
+        anywhere under the web application's root as long as it's where the
+        <code>taglib-location</code> element declares it to be.</p>
+
+        <p>Next, make sure the JAR file with the implementation classes is in
+        the <code>WEB-INF/lib</code> directory so that the container can find
+        them at run time.</p>
+
+        <p>Finally, use the custom tags in a JSP. In order for a JSP to make
+        use of a custom tag library, it needs to declare that it's using it.
+        This is done at the top of the JSP with a <code>taglib</code>
+        declaration. Like this:</p>
+
+        <pre>&lt;%@ taglib uri="http://marklogic.com/jsp/taglib" prefix="xq" %&gt;</pre>
+
+        <p>The <code>uri</code> attribute must match the name in the
+        <code>taglib</code> definition in the <code>web.xml</code> file. The
+        prefix can be anything you like, it defines the XML name space that
+        will identify this tag library within the scope of the JSP page. The
+        <code>xq</code> prefix will be used throughout this tutorial, but you
+        can pick something else if you prefer.</p>
+
+        <p>Here is a complete JSP example:</p>
+
+        <pre><code>&lt;%@ taglib uri="http://marklogic.com/jsp/taglib" prefix="xq" %&gt;
+
+&lt;xq:setDataSource host="localhost" port="8003"/&gt;
+
+&lt;html&gt;&lt;head&gt;&lt;title&gt;xq:query example 1&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+My favorite fruits:
+&lt;ul&gt;
+&lt;xq:execute&gt;
+    &lt;xq:query&gt;
+        for $i in ("apple", "pear", "orange", "guava")
+          return &lt;li&gt;{ $i }&lt;/li&gt;
+    &lt;/xq:query&gt;
+&lt;/xq:execute&gt;
+&lt;/ul&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+        <p>This JSP outputs an HTML page with a bullet list that looks like
+        this:</p>
+
+        <div id="sampleul">My favorite
+        fruits: <ul>
+                <li>apple</li>
+
+                <li>pear</li>
+
+                <li>orange</li>
+
+                <li>guava</li>
+            </ul></div>
+
+        <p>We'll use this example through the rest of this tutorial, showing
+        how to achieve the same result using different approaches.</p>
+
+        <h2>The XQ Tags</h2>
+
+        <p>Let's take a look now at the specifics of the Mark Logic XQuery JSP
+        tag library, which I'll refer to from here on as the <i>XQ
+        tags</i>.</p>
+
+        <p>Because a network connection is used to communicate with the
+        server, it's possible for arbitrarily large results to be returned.
+        The tags in the XQ tag library operate in either streaming or buffered
+        modes depending on the attributes specified in an
+        <code>xq:execute</code> or <code>xq:result</code> tag (more on those
+        shortly).</p>
+
+        <p>The result of an XQuery execution is a sequence of zero or more
+        result items, each of which may be any of the types defined by the <a
+        href="http://www.w3c.org/TR/2003/WD-xquery-20030502/">XQuery spec</a>.
+        When the result is streaming, the items must be accessed sequentially
+        and are only available one at a time.</p>
+
+        <p>In buffered mode, the full result is read from the XDBC connection
+        and stored in a named container variable. There is no further
+        dependence on the connection, so buffered results may be retained in
+        the container as long as needed and forwarded to other JSPs or to
+        servlets as desired. The items in the result may also be accessed
+        randomly and/or repeatedly.</p>
+
+        <h2>Getting Connected</h2>
+
+        <p>Let's first look at how to establish a connection to a Content
+        Interaction Server instance. The XQ tags use the concept of a
+        datasource from which connections are obtained. There are two XQ tags
+        related to datasources: <code>xq:setDataSource</code> and
+        <code>xq:unSetDataSource</code>.</p>
+
+        <p>The <code>xq:setDataSource</code> tag is given the information
+        needed to establish a server connection and stores an opaque object
+        that will be used later by the <code>xq:execute</code> tag. If the
+        name of a container variable to set is not provided, an internal
+        default is used. The scope is <code>page</code> by default. Some
+        examples:</p>
+
+        <pre><code>&lt;xq:setDataSource host="localhost" port="8003" user="joe" password="hush"/&gt;
+&lt;xq:setDataSource var="myconn" host="... /&gt;
+&lt;xq:setDataSource scope="session" host="... /&gt;
+&lt;xq:setDataSource dataSource="techpubsdb" scope="request"/&gt;
+&lt;xq:setDataSource&gt;Executing a Query
+    &lt;xq:host&gt;localhost&lt;/xq:host&gt;
+    &lt;xq:user configParameter="cisusername"/&gt;
+&lt;/xq:setDataSource&gt;</code></pre>
+
+        <p>The first example above is the typical way of setting up an XDBC
+        datasource with hard-coded values, using the default variable name and
+        scope to store the datasource object. The second example gives an
+        explicit variable name to use while the third uses the default name
+        but stores the datasource object in session scope.</p>
+
+        <p>The fourth example gives the name of a pre-existing datasource (a
+        JNDI lookup key) that should be used rather than creating a new one.
+        Using named datasources allows the connection information to be set
+        externally rather than in the JSP body. The drawback is that a
+        JNDI-compliant naming service must be available at runtime.</p>
+
+        <p>The <code>xq:setDataSource</code> can also accept nested tags to
+        specify the connection information. Each nested tag has the same name
+        as the corresponding attribute. These tags take two forms: parameter
+        value as the body of the tag, or an attribute naming a web application
+        parameter (defined in <code>web.xml</code>) whose value should be
+        used. This is an alternate way of externalizing connection information
+        without requiring a JNDI service.</p>
+
+        <pre><code>&lt;xq:unSetDataSource/&gt;
+&lt;xq:unSetDataSource var="myconn" scope="session" /&gt;</code></pre>
+
+        <p>The <code>xq:unSetDataSource</code> tag is used to clear a variable
+        containing an XDBC datasource object. Standard tags in the JSTL can be
+        used to do this, if you know the name of the variable. This tag is
+        provided so that you can clear a datasource that was set to the
+        default internal name (which is intentionally kept hidden).</p>
+
+        <p>If datasource objects are stored in page or request scope, it's
+        usually not necessary to clear them, since the variable will soon fall
+        out of scope anyway. But a longer-lived datasource may be holding a
+        connection pool, so it's a good idea clear it when you're done if it's
+        in session or application scope.</p>
+
+        <p>Naming datasources should only be necessary if there is a chance
+        that more than one will be active at once. In most cases you can use
+        the default internal name, which means you won't need to name a
+        datasource on the <code>xq:execute</code> tag.</p>
+
+        <h2>Executing Queries</h2>
+
+        <p>Now that we know how to specify where the server is, let's look at
+        how to talk to it. The <code>xq:execute</code> tag encapsulates
+        sending a query to the server and receiving the result. Here are a
+        couple of simple examples:</p>
+
+        <pre><code>&lt;xq:execute var="result"&gt;
+    &lt;xq:query&gt;"Hello World"&lt;/xq:query&gt;
+&lt;/xq:execute&gt;
+
+&lt;xq:execute&gt;
+    &lt;xq:query&gt;"Hello World"&lt;/xq:query&gt;
+&lt;/xq:execute&gt;</code></pre>
+
+        <p>The first example, where the <code>var</code> attribute is
+        provided, is buffered. When the tag finishes execution, the variable
+        <code>result</code> will contain an Java object of type
+        <code>Result</code> (more on that later) which holds the result of the
+        query. No output will be generated by the <code>xq:execute</code> tag,
+        so it effectively disappears from the page.</p>
+
+        <p>The second example streams its output (replacing the
+        <code>xq:execute</code> tag in the page with the result of the query)
+        because no result variable name was given.</p>
+
+        <p>If you want to do more with the query result than dump it to the
+        output, an <code>xq:result</code> tag may be nested within
+        <code>xq:execute</code> (it must follow <code>xq:query</code>). But
+        the <code>xq:result</code> tag may only be used when streaming. It is
+        an error to nest an <code>xq:result</code> tag if the enclosing
+        <code>xq:execute</code> tag also has a <code>var</code> attribute
+        (which implies buffered mode).</p>
+
+        <p>Using the <code>xq:result</code> tag allows you to decorate the
+        result data with other markup. It's a looping tag whose body is
+        executed once for each item in the result. In order for the
+        <code>xq:result</code> tag to know where the result data should go,
+        you can use the <code>xq:streamItem</code> to emit a string
+        representation of the current result item (there are other ways, which
+        we'll look at later).</p>
+
+        <p>That's a lot of description. Here's an example to show how it
+        works:</p>
+
+        <pre><code>&lt;%@ taglib uri="http://marklogic.com/jsp/taglib" prefix="xq" %&gt;
+
+&lt;xq:setDataSource host="localhost" port="8003"/&gt;
+
+&lt;html&gt;&lt;head&gt;&lt;title&gt;xq:query example 2&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+My favorite fruits:
+&lt;ul&gt;
+&lt;xq:execute&gt;
+    &lt;xq:query&gt;
+        ("apple", "pear", "orange", "guava")
+    &lt;/xq:query&gt;
+    &lt;xq:result&gt;
+       &lt;li&gt;&lt;xq:streamItem/&gt;&lt;/li&gt;
+    &lt;/xq:result&gt;
+&lt;/xq:execute&gt;
+&lt;/ul&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+        <p>This is a revision of the fruity example above. But in this one,
+        the HTML markup tags have been removed from the XQuery code so that it
+        now returns a simple sequence of strings. Each result item in the
+        sequence is nested in an <code>&lt;li&gt;</code> tag in the JSP rather
+        than mixing them into the XQuery script and having the server generate
+        them. The resulting page is identical, but the data and presentation
+        markup have been cleanly decoupled.</p>
+
+        <h2>Playing Well With Others</h2>
+
+        <p>Both the <code>xq:execute</code> tag and the <code>xq:result</code>
+        tag accept a <code>var</code> attribute. This attribute names a
+        variable to be set as a part of query processing. The XQ tag library
+        defines two Java interfaces that are used by these tags. They are
+        <code>Result</code> (set by <code>xq:execute</code>) and
+        <code>ResultItem</code> (set by <code>xq:result</code>). Both are in
+        the <code>com.marklogic.jsptaglib.xquery.common package</code>:</p>
+
+        <pre><code>public interface Result
+{
+    int getSize();
+    ResultItem [] getItems();
+    ResultItem getItem (int index);
+}
+
+public interface ResultItem
+{
+    int getIndex();
+    boolean isNode();
+    Object getObject();
+    String getString();
+    org.w3c.dom.Document getW3cDom() throws XDBCException;
+    org.jdom.Document getJDom() throws XDBCException;
+    Reader getReader();
+}</code></pre>
+
+        <p>Let's look at an example of using the <code>var</code> attribute
+        with <code>xq:execute</code>. This is "fully buffered mode" where the
+        entire query result is read and buffered in memory before control
+        returns to the JSP and an instance of <code>Result</code> is stored in
+        the named container variable:</p>
+
+        <pre><code>&lt;%@ taglib uri="http://marklogic.com/jsp/taglib" prefix="xq" %&gt;
+&lt;%@ taglib uri="http://sun.com/jstl/c" prefix="c" %&gt;
+
+&lt;xq:setDataSource host="localhost" port="8003"/&gt;
+&lt;xq:execute var="result"&gt;
+    &lt;xq:query&gt;
+        ("apple", "pear", "orange", "guava")
+    &lt;/xq:query&gt;
+&lt;/xq:execute&gt;
+
+&lt;html&gt;&lt;head&gt;&lt;title&gt;xq:query example 3&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+My favorite fruits:
+&lt;ul&gt;
+    &lt;c:forEach var="item" items="${result.items}"&gt;
+        &lt;li&gt;&lt;c:out value="${item.string}"/&gt;&lt;/li&gt;
+    &lt;/c:forEach&gt;
+&lt;/ul&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+        <p>This example makes use of the JSTL control tags to access the
+        <code>Result</code> object buffering the query result. The execution
+        of the query has also been moved to the top of the JSP so that it
+        occurs before any other markup is evaluated. The <code>result</code>
+        variable is accessed later by the <code>c:forEach</code> tag.</p>
+
+        <p>Using this processing model, the buffered result could as easily
+        have been stored in a request scope variable and passed on to another
+        JSP or a servlet for formatting. Decoupling query execution from
+        presentation markup better facilitates Model View Controller
+        architectures.</p>
+
+        <p>The <code>ResultItem</code> interface provides several useful
+        accessor methods that can be called from Java code to retrieve the
+        data in various ways. Those accessors also constitute bean properties
+        that can be referenced by JSP 2.0 Expression Language constructs as in
+        the example code above.</p>
+
+        <h2>Semi-Buffered</h2>
+
+        <p>When the <code>xq:execute</code> tag is buffered (<code>var</code>
+        is specified) a nested <code>xq:result</code> tag may <b>not</b> be
+        used. This is because the <code>xq:result</code> tag iterates over the
+        each item in the result stream. When <code>xq:execute</code> is
+        buffered, the items have already been read and stored in a
+        <code>Result</code> object instance.</p>
+
+        <p>However, it's often useful to access result items through the
+        <code>ResultItem</code> API from within the body of an
+        <code>xq:result</code> tag. If you specify a <code>var</code>
+        attribute on an xq:result tag, then on each iteration of the tag that
+        variable will be set to a <code>ResultItem</code> instance that holds
+        the content of the current result item. In this case each item in the
+        result stream is buffered, one at a time, for the duration of an
+        iteration, then discarded. </p>
+
+        <p>Here's the fruit example using the semi-buffered idiom:</p>
+
+        <pre><code>&lt;%@ taglib uri="http://marklogic.com/jsp/taglib" prefix="xq" %&gt;
+&lt;%@ taglib uri="http://sun.com/jstl/c" prefix="c" %&gt;
+
+&lt;xq:setDataSource host="localhost" port="8003"/&gt;
+
+&lt;html&gt;&lt;head&gt;&lt;title&gt;xq:query example 4&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+My favorite fruits:
+&lt;ul&gt;
+&lt;xq:execute&gt;
+    &lt;xq:query&gt;
+        ("apple", "pear", "orange", "guava")
+    &lt;/xq:query&gt;
+    &lt;xq:result var="item"&gt;
+        &lt;li&gt;&lt;c:out value="${item.string}"/&gt;&lt;/li&gt;
+    &lt;/xq:result&gt;
+&lt;/xq:execute&gt;
+&lt;/ul&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+        <p>Here you can see that the body of the <code>xq:result</code> tag is
+        identical to that of the <code>c:forEach</code> in the previous
+        example. Both are looping tags and both use the
+        <code>ResultItem</code> interface in the same way. But because the
+        <code>ResultItem</code> is short-lived when semi-buffering, we've had
+        to return to the pattern of doing query execution inline rather than
+        before the main page evaluation..</p>
+
+        <h2>Future Enhancements</h2>
+
+        <p>The XQ tag library also includes a tag that we haven't talked
+        about: <code>xq:param</code>. This tag will be used to pass parameters
+        as XQuery external variables. As of this writing Content Interaction
+        Server does not yet support this capability but it is planned for a
+        future release.</p>
+
+        <p>There will also be support in the <code>xq:execute</code> tag to
+        name a server-resident module, similar to a stored procedure, rather
+        than passing a query script from the client to the server.</p>
+
+        <p>As soon as these features become available in the server, the XQ
+        tags will be updated to make use of them.</p>
+
+        <h2>Summary</h2>
+
+        <p>The preceding has been a whirlwind tour of the Mark Logic XQ JSP
+        tags. We can't possibly cover all the possible ways that the XQ tag
+        library can be put to use in the real world. See the documentation
+        included in the XQ tag library code distribution for further
+        information.</p>
+
+        <p>It's our hope that this library will make it easier for developers
+        to integrate Content Interaction Servers into J2EE applications. As
+        time goes on, we hope to see this and similar projects on
+        <b>xq:zone</b> evolve to better meet the needs of the community.</p>
+
+        <p>The example JSPs shown here are included in the XQ tags source
+        distribution that's downloadable from the <a
+        href="http://xqzone.marklogic.com"><b>xq:zone</b> Developer
+        Website</a>. There are other JSP examples included in the distribution
+        as well. Download the code and take it for a spin.</p>
+
+        <p>Please join the <a
+        href="http://xqzone.marklogic.com/discuss/">mailing list</a> and let
+        us know your experiences with the XQ tag library and how you're
+        putting it to use.</p>
+
+	<p>Good Luck!</p>
+
+    </body>
+</html>
