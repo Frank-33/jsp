@@ -104,7 +104,7 @@ Tag Usage Examples
 ------------------
 
 # General form, using xq:result tag and buffered items
-# Body of xq:resultSequence runs once for each result in the sequence
+# Body of xq:result runs once for each result in the sequence
 <xq:execute dataSource="datasurce">
 	<xq:query>
 		for ...
@@ -252,14 +252,15 @@ Tag Usage Examples
 Java Interfaces used by xq:query
 --------------------------------
 
-# An instance of this is set in "var" by the xq:execute tag
+# An instance of this may be set in "var" by the xq:execute tag
 public interface Result
 {
 	int getSize();
-	Item [] getSequence();
+	Item [] getItems();
 	Item getItem (int index);
 }
 
+# An instance of this may be set in "var" by the xq:result tag
 public interface ResultItem
 {
 	int index;
