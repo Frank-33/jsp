@@ -21,8 +21,8 @@ public class PrintItemTag extends BodyTagSupport
 {
 	public int doEndTag () throws JspException
 	{
-		ResultSequenceTag resultSequence = (ResultSequenceTag)
-			findAncestorWithClass (this, ResultSequenceTag.class);
+		ResultTag resultSequence = (ResultTag)
+			findAncestorWithClass (this, ResultTag.class);
 
 		if (resultSequence == null) {
 			throw new JspException ("The xq:print tag must be inside xq:resultSequence");

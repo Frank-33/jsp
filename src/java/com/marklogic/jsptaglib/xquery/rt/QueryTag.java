@@ -34,8 +34,8 @@ import java.io.IOException;
  * written between each result."
  * @see com.marklogic.jsptaglib.xquery.common.ResultSequence
  * @see com.marklogic.jsptaglib.xquery.common.Result
- * @see com.marklogic.jsptaglib.xquery.statement.rt.StatementTag
- * @see com.marklogic.jsptaglib.xquery.statement.rt.ResultSequenceTag
+ * @see com.marklogic.jsptaglib.xquery.rt.ExecuteTag
+ * @see com.marklogic.jsptaglib.xquery.rt.ResultTag
  */
 public class QueryTag extends BodyTagSupport
 	implements StatementProperties, TryCatchFinally

@@ -3,8 +3,9 @@
  */
 package com.marklogic.jsptaglib.xquery.rt;
 
-import com.marklogic.jsptaglib.xquery.rt.SetDataSourceTag;
 import com.marklogic.jsptaglib.xquery.common.StatementProperties;
+import com.marklogic.jsptaglib.xquery.common.ResultSequenceImpl;
+import com.marklogic.jsptaglib.xquery.XdbcHelper;
 import com.marklogic.jsptaglib.AttributeHelper;
 import com.marklogic.xdbc.XDBCConnection;
 import com.marklogic.xdbc.XDBCException;
@@ -20,21 +21,36 @@ import javax.servlet.jsp.tagext.TryCatchFinally;
 import java.io.IOException;
 
 /**
- * @jsp:tag name="statement" description="Mark Logic XDBC Statement Tag"
+ * @jsp:tag name="execute" description="Mark Logic XDBC Statement Tag"
  *  body-content="JSP"
  */
-public class StatementTag extends BodyTagSupport
+public class ExecuteTag extends BodyTagSupport
 	implements StatementProperties, TryCatchFinally
 {
 	private String var = null;
-	private String query = null;
 	private String scope = null;
+	private String query = null;
+	private String module = null;
+	private String separator = null;
 	private XDMPDataSource dataSource = null;
+
+	private boolean queryExecuted = false;
 
 	private XDBCStatement xdbcStatement = null;
 	private XDBCConnection xdbcConnection = null;
 
 	// -------------------------------------------------------------
+
+	public void release ()
+	{
+		dataSource = null;
+		query = null;
+		module = null;
+		xdbcStatement = null;
+		xdbcConnection = null;
+		var = null;
+		scope = null;
+	}
 
 	/**
 	 * @jsp:attribute required="false" rtexprvalue="true"
@@ -63,19 +79,30 @@ public class StatementTag extends BodyTagSupport
 	/**
 	 * @jsp:attribute required="false" rtexprvalue="true"
 	 */
+	public void setModule (String module) throws JspException
+	{
+		this.module = module;
+	}
+
+	/**
+	 * @jsp:attribute required="false" rtexprvalue="true"
+	 */
+	public void setSeparator (String separator) throws JspException
+	{
+		this.separator = separator;
+	}
+
+	/**
+	 * @jsp:attribute required="false" rtexprvalue="true"
+	 */
 	public void setDataSource (XDMPDataSource dataSource)
 	{
 		this.dataSource = dataSource;
 	}
 
-	public void release ()
+	public void setQueryExecuted (boolean queryExecuted)
 	{
-		dataSource = null;
-		query = null;
-		xdbcStatement = null;
-		xdbcConnection = null;
-		var = null;
-		scope = null;
+		this.queryExecuted = queryExecuted;
 	}
 
 	// ------------------------------------------------------------------------
@@ -96,12 +123,7 @@ public class StatementTag extends BodyTagSupport
 
 		try {
 			xdbcConnection = SetDataSourceTag.getConnection (pageContext, (XDMPDataSource) dataSource, true);
-
 			xdbcStatement = xdbcConnection.createStatement();
-
-			if (var != null) {
-				AttributeHelper.setScopedAttribute (pageContext, var, xdbcStatement, scope);
-			}
 		} catch (XDBCException e) {
 			throw new JspException ("Cannot create XDBCStatement", e);
 		}
@@ -126,17 +148,51 @@ public class StatementTag extends BodyTagSupport
 	public int doEndTag()
 		throws JspException
 	{
-		if (var != null) {
-			AttributeHelper.removeScopedAttribute (pageContext, var, scope);
+		if (queryExecuted) {
+			if (var == null) {
+				return (EVAL_PAGE);
+			}
+
+			throw new JspException ("Cannot use both var attribute and nested result tag");
 		}
 
 		try {
-			xdbcStatement.close();
+			// TODO: Handle "module" attribute being set instead of "query"
+			XDBCResultSequence xdbcResultSequence = xdbcStatement.executeQuery (query);
+
+			if (var == null) {
+				outputResult (xdbcResultSequence, separator);
+			} else {
+				setResult (xdbcResultSequence, var);
+			}
 		} catch (XDBCException e) {
-			throw new JspException ("Closing statement", e);
+			throw new JspException ("executing query", e);
 		}
 
 		return EVAL_PAGE;
+	}
+
+	private void setResult (XDBCResultSequence xdbcResultSequence, String var)
+		throws JspException
+	{
+		try {
+			AttributeHelper.setScopedAttribute (pageContext, var,
+				new ResultSequenceImpl (xdbcResultSequence), scope);
+		} catch (XDBCException e) {
+			throw new JspException ("creating Result object", e);
+		}
+	}
+
+	private void outputResult (XDBCResultSequence xdbcResultSequence, String separator)
+		throws JspException
+	{
+		try {
+			XdbcHelper.concatResult (xdbcResultSequence, pageContext.getOut(), separator);
+		} catch (XDBCException e) {
+			throw new JspException ("processing result", e);
+		} catch (IOException e) {
+			throw new JspException ("writing result", e);
+		}
 	}
 
 	// ------------------------------------------------------------------------
@@ -149,6 +205,11 @@ public class StatementTag extends BodyTagSupport
 	public void doFinally ()
 	{
 		try {
+			if (xdbcStatement != null) {
+				xdbcStatement.close();
+				xdbcStatement = null;
+			}
+
 			if (xdbcConnection != null) {
 				xdbcConnection.close();
 				xdbcConnection = null;

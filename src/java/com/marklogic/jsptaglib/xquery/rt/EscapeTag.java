@@ -11,13 +11,14 @@ import javax.servlet.jsp.JspWriter;
 import java.io.IOException;
 
 /**
+ * @deprecated Don not use
  * @jsp:tag name="escape"
  *  description="Escape any chars that might have special meaning"
  */
 public class EscapeTag extends BodyTagSupport
 {
 	protected static String STD_CHARS_TO_ESCAPE = "\\{}<>'\"";
-	
+
 	private String escapeChars = STD_CHARS_TO_ESCAPE;
 
 	// --------------------------------------------------------------

@@ -8,6 +8,7 @@ import org.apache.taglibs.standard.lang.support.ExpressionEvaluatorManager;
 import javax.servlet.jsp.JspException;
 
 /**
+ * @deprecated Don not use
  * @jsp:tag name="escape"
  *  description="Escape any chars that might have special meaning"
  */

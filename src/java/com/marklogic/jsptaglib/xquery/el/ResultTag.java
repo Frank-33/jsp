@@ -8,10 +8,10 @@ import org.apache.taglibs.standard.lang.support.ExpressionEvaluatorManager;
 import javax.servlet.jsp.JspException;
 
 /**
- * @jsp:tag name="resultSequence" description="XDBC Result Sequence Tag"
+ * @jsp:tag name="result" description="XDBC Result Sequence Tag"
  *  body-content="JSP"
  */
-public class ResultSequenceTag extends com.marklogic.jsptaglib.xquery.rt.ResultSequenceTag
+public class ResultTag extends com.marklogic.jsptaglib.xquery.rt.ResultTag
 {
 	public void setVar (String var) throws JspException
 	{

@@ -3,6 +3,7 @@
  */
 package com.marklogic.jsptaglib.xquery.rt;
 
+import com.marklogic.jsptaglib.TagPropertyHelper;
 import com.marklogic.jsptaglib.AttributeHelper;
 import com.marklogic.jsptaglib.xquery.XdbcHelper;
 import com.marklogic.xdbc.XDBCException;
@@ -13,21 +14,23 @@ import org.w3c.dom.Node;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.BodyTagSupport;
+import javax.servlet.jsp.tagext.TagSupport;
 
 import java.io.IOException;
 import java.io.Reader;
 
 /**
- * @jsp:tag name="resultSequence" description="XDBC Result Sequence Tag"
+ * @jsp:tag name="result" description="XDBC Result Sequence Tag"
  *  body-content="JSP"
  */
-public class ResultSequenceTag extends BodyTagSupport
+public class ResultTag extends BodyTagSupport
 {
 	private XDBCResultSequence xdbcResultSequence;
 	private String var = null;
-	private boolean loop = true;
-	private String name = null;
+//	private boolean loop = true;
+//	private String name = null;
 	private String scope = null;
+
 	private int index = 0;
 	private boolean currentResultFetched = false;
 	private Object currentResultObject = null;
@@ -46,18 +49,18 @@ public class ResultSequenceTag extends BodyTagSupport
 	/**
 	 * @jsp:attribute required="false" rtexprvalue="true"
 	 */
-	public void setLoop (boolean loop)
-	{
-		this.loop = loop;
-	}
+//	public void setLoop (boolean loop)
+//	{
+//		this.loop = loop;
+//	}
 
 	/**
 	 * @jsp:attribute required="false" rtexprvalue="true"
 	 */
-	public void setName (String name) throws JspException
-	{
-		this.name = name;
-	}
+//	public void setName (String name) throws JspException
+//	{
+//		this.name = name;
+//	}
 
 	/**
 	 * @jsp:attribute required="false" rtexprvalue="true"
@@ -70,9 +73,9 @@ public class ResultSequenceTag extends BodyTagSupport
 	public void release ()
 	{
 		xdbcResultSequence = null;
-		loop = true;
+//		loop = true;
 		var = null;
-		name = null;
+//		name = null;
 		scope = null;
 		index = 0;
 	}
@@ -169,28 +172,17 @@ public class ResultSequenceTag extends BodyTagSupport
 
 	public int doStartTag() throws JspException
 	{
+		if (TagSupport.findAncestorWithClass (this, ExecuteTag.class) != null) {
+			throw new JspException ("result tag must be nested in an execute tag");
+		}
+
 		// reset body's content, otherwise it could result in an error if container is pooling
 		// tag handlers (see bug 26863 for more details)
 		super.bodyContent = null;
 
 		try {
-			// if name property given, retrieve resultset from context
-			if (name != null) {
-				xdbcResultSequence = (XDBCResultSequence)
-					AttributeHelper.getScopedAttribute (pageContext, name, scope);
-			} else {
-				StatementTag statementTag =
-					(StatementTag) findAncestorWithClass (this, StatementTag.class);
-				xdbcResultSequence = statementTag.executeQuery();
-			}
-
-			if (var != null) {
-				AttributeHelper.setScopedAttribute (pageContext, var, xdbcResultSequence, scope);
-			}
-
-			if (loop == false) {
-				return EVAL_BODY_BUFFERED;
-			}
+			ExecuteTag statementTag = (ExecuteTag) findAncestorWithClass (this, ExecuteTag.class);
+			xdbcResultSequence = statementTag.executeQuery();
 
 			if (xdbcResultSequence.hasNext() == false) {
 				return SKIP_BODY;
@@ -208,10 +200,6 @@ public class ResultSequenceTag extends BodyTagSupport
 
 	public int doAfterBody() throws JspException
 	{
-		if (loop == false) {
-			return EVAL_PAGE;
-		}
-
 		try {
 			if (xdbcResultSequence.hasNext()) {
 				stepToNextElement();
@@ -244,6 +232,8 @@ public class ResultSequenceTag extends BodyTagSupport
 			}
 		}
 
+		TagPropertyHelper.assignAncestorProperty (this, ExecuteTag.class, "queryExecuted", true);
+
 		// we have to call this guy manually now
 		// with the spec clarification
 		release();
@@ -262,6 +252,7 @@ public class ResultSequenceTag extends BodyTagSupport
 		}
 	}
 
+	// TODO: Create Item object, set var if non-null
 	private void stepToNextElement ()
 		throws XDBCException
 	{

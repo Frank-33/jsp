@@ -10,10 +10,10 @@ import org.apache.taglibs.standard.lang.support.ExpressionEvaluatorManager;
 import javax.servlet.jsp.JspException;
 
 /**
- * @jsp:tag name="statement" description="Statement Tag, Expression Language enabled"
+ * @jsp:tag name="execute" description="Statement Tag, Expression Language enabled"
  *  body-content="JSP"
  */
-public class StatementTag extends com.marklogic.jsptaglib.xquery.rt.StatementTag
+public class ExecuteTag extends com.marklogic.jsptaglib.xquery.rt.ExecuteTag
 {
 	/**
 	 * @jsp:attribute required="false" rtexprvalue="false"
@@ -37,6 +37,22 @@ public class StatementTag extends com.marklogic.jsptaglib.xquery.rt.StatementTag
 	public void setQuery (String query) throws JspException
 	{
 		super.setQuery ((String) ExpressionEvaluatorManager.evaluate ("query", query, String.class, this, pageContext));
+	}
+
+	/**
+	 * @jsp:attribute required="false" rtexprvalue="false"
+	 */
+	public void setModule (String module) throws JspException
+	{
+		super.setModule ((String) ExpressionEvaluatorManager.evaluate ("module", module, String.class, this, pageContext));
+	}
+
+	/**
+	 * @jsp:attribute required="false" rtexprvalue="false"
+	 */
+	public void setSeparator (String separator) throws JspException
+	{
+		super.setSeparator ((String) ExpressionEvaluatorManager.evaluate ("separator", separator, String.class, this, pageContext));
 	}
 
 	/**
