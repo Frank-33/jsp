@@ -1,6 +1,6 @@
 <%@ page import = "com.marklogic.xdmp.*,
-				   com.marklogic.jsptaglib.xquery.queryhelper.QueryExecuter,
-				   com.marklogic.jsptaglib.xquery.queryhelper.Query" %>
+	com.marklogic.jsptaglib.xquery.queryhelper.QueryExecuter,
+	com.marklogic.jsptaglib.xquery.queryhelper.Query" %>
 <%@ page import = "com.marklogic.xdbc.*" %>
 
 <html>
