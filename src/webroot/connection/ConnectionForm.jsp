@@ -3,14 +3,15 @@
 
 <c:choose>
 <c:when test="${param.posting != 'true'}">
+
 <html>
 <head><title>Connection Parameters</title>
 <link rel="stylesheet" href="/jsp.css" media="screen" />
 </head>
 <body>
-<div id="header"><h1>Please provide connection information for the CIS server</h1></div>
+<div id="header"><h1>Please provide connection information for the MarkLogic Server</h1></div>
 <div id="main">
-	<form>
+	<form action="">
 	Host: <input type="text" name="host"><br>
 	Port: <input type="text" name="port"><br>
 	User: <input type="text" name="user"><br>
@@ -22,9 +23,10 @@
 </div>
 </body>
 </html>
-</c:when>
 
+</c:when>
 <c:otherwise>
+
 <xq:setDataSource host="${param.host}" port="${param.port}"
  user="${param.user}" password="${param.pass}"
  scope="session"/>

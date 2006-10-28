@@ -13,7 +13,7 @@
 <body>
 <div id="header"><h1>Enter your query here</h1></div>
 <div id="main">
-<form method="POST">
+<form action="" method="POST">
 	<input type="hidden" name="posting" value="true">
 	<textarea name="xquery" rows="30" cols="80"><c:out value="${param.xquery}" escapeXml="false" /></textarea>
 	<br>
@@ -46,3 +46,4 @@
 <form action="/"><input type="submit" value="Go Home"></form>
 </div>
 </body>
+</html>

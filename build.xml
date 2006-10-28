@@ -51,8 +51,6 @@
 	<property name="log4j.jar" value="${jarlib}/log4j.jar"/>
 	<property name="commons.collections.jar" value="${jarlib}/commons-collections-2.0.jar"/>
 	<property name="commons.logging.jar" value="${jarlib}/commons-logging.jar"/>
-	<property name="xdbc.jar" value="${jarlib}/xdbc.jar"/>
-	<property name="xdmp.jar" value="${jarlib}/xdmp.jar"/>
 	<property name="jdom.jar" value="${jarlib}/jdom.jar"/>
 	<property name="apachejstl.jar" value="${jarlib}/standard.jar"/>
 	<property name="xqrunner.jar" value="${jarlib}/xqrunner.jar"/>
@@ -101,19 +99,17 @@
 	</target>
 
 	<target name="clean">
-			<delete dir="${buildtmp}"/>
+		<delete dir="${buildtmp}"/>
 	</target>
 
 	<target name="cleanest" depends="clean">
-			<delete dir="${products}"/>
+		<delete dir="${products}"/>
 	</target>
 
 	<!-- ********************************************************** -->
 
 	<path id="taglib.compile.classpath">
 		<pathelement path="${servlet.jar}"/>
-		<pathelement path="${xdbc.jar}"/>
-		<pathelement path="${xdmp.jar}"/>
 		<pathelement path="${jdom.jar}"/>
 		<pathelement path="${apachejstl.jar}"/>
 		<pathelement path="${xqrunner.jar}"/>
@@ -134,9 +130,10 @@
 	<target name="compile.taglib" depends="init">
 		<javac classpathref="taglib.compile.classpath" srcdir="${java.source}"
 			destdir="${compiled.classes.dir}" deprecation="on"
-			debug="${compile.debug.symbols.flag}">
+			debug="${compile.debug.symbols.flag}" source="1.4" target="1.4">
 
 			<exclude name="${taglib.java.dir}/statement/**"/>
+			<compilerarg value="-Xlint:unchecked"/>
 		</javac>
 	</target>
 
@@ -154,7 +151,7 @@
 				<formatter type="plain" usefile="false"/>
 
 				<batchtest fork="no">
-						<fileset dir="${junit.source}" includes="**/Test*.java"/>
+					<fileset dir="${junit.source}" includes="**/Test*.java"/>
 				</batchtest>
 		</junit>
 	</target>
@@ -201,7 +198,7 @@
 
 			<classpath refid="taglib.compile.classpath"/>
 			<doctitle><![CDATA[<h1>Mark Logic JSP TagLib</h1>]]></doctitle>
-			<bottom><![CDATA[<i>Copyright &copy; 2004 Mark Logic Corporation, All Rights Reserved.</i>]]></bottom>
+			<bottom><![CDATA[<i>Copyright &copy; 2004-2006 Mark Logic Corporation, All Rights Reserved.</i>]]></bottom>
 		</javadoc>
 		<zip zipfile="${javadoc.zipfile}" basedir="${javadoc.dir}"/>
 
@@ -210,6 +207,13 @@
 	<!-- ********************************************************** -->
 
 	<target name="webapp" depends="generate.taglib.jar">
+		<mkdir dir="${generated.files}"/>
+		<copy todir="${generated.files}/source" overwrite="true">
+			<fileset dir="${webroot.source}" includes="**/*.jsp"/>
+			<mapper type="glob" from="*" to="*.txt"/>
+		</copy>
+
+
 		<war warfile="${output.warfile}" basedir="${webroot.source}" update="false"
 			webxml="${config.source}/webapp/web.xml" >
 
@@ -223,13 +227,13 @@
 				<include name="*.jar"/>
 			</lib>
 			<lib dir="${jarlib}">
-				<include name="xdbc.jar"/>
-				<include name="xdmp.jar"/>
+				<include name="xcc.jar"/>
 				<include name="jdom.jar"/>
 				<include name="jstl.jar"/>
 				<include name="standard.jar"/>
 				<include name="xqrunner.jar"/>
 			</lib>
+			<fileset dir="${generated.files}" includes="source/**"/>
 		</war>
 	</target>
 

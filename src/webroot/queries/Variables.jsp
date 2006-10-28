@@ -27,12 +27,12 @@
 <body>
 <div id="header"><h1>Enter some variable values</h1></div>
 <div id="main">
-<form method="POST">
+<form action="" method="POST">
 	<input type="hidden" name="posting" value="true">
 
-	Enter a String: <input type="text" name="extstring" value="<%=request.getParameter ("extstring")%>"></br>
-	Enter an integer: <input type="text" name="extint" value="<%=request.getParameter ("extint")%>"></br>
-	Enter another String: <input type="text" name="extnsstring" value="<%=request.getParameter ("extnsstring")%>"></br>
+	Enter a String: <input type="text" name="extstring" value="<%=(request.getParameter ("extstring") == null) ? "" : request.getParameter ("extstring")%>"><br/>
+	Enter an integer: <input type="text" name="extint" value="<%=(request.getParameter ("extint") == null) ? "" : request.getParameter ("extint")%>"><br/>
+	Enter another String: <input type="text" name="extnsstring" value="<%=(request.getParameter ("extnsstring") == null) ? "" : request.getParameter ("extnsstring")%>"><br/>
 	<br/>
 
 	<input type="submit" value="Run">
@@ -64,3 +64,4 @@
 <form action="/"><input type="submit" value="Go Home"></form>
 </div>
 </body>
+</html>

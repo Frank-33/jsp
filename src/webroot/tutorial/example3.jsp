@@ -1,7 +1,7 @@
 <%@ taglib uri="http://marklogic.com/jsp/taglib" prefix="xq" %>
 <%@ taglib uri="http://sun.com/jstl/c" prefix="c" %>
 
-<xq:setDataSource host="localhost" port="8003" user="test" password="test"/>
+<xq:setDataSource host="localhost" port="8003" user="admin" password="admin"/>
 <xq:execute var="result">
     <xq:query>
         ("apple", "pear", "orange", "guava")
