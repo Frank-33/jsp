@@ -138,7 +138,7 @@ public class ResultTag extends BodyTagSupport implements TryCatchFinally
 			throw new JspException ("Marshalling next item value: " + e, e);
 		}
 
-		return EVAL_PAGE;
+		return SKIP_BODY;
 	}
 
 	public int doEndTag() throws JspException

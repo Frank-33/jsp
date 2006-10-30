@@ -143,7 +143,7 @@ import java.io.IOException;
 			throw new JspException ("trimming setDataSource tag body", e);
 		}
 
-		return EVAL_PAGE;
+		return SKIP_BODY;
 	}
 
 	public int doEndTag () throws JspException

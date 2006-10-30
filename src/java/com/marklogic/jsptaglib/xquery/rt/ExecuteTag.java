@@ -177,7 +177,7 @@ public class ExecuteTag extends BodyTagSupport
 
 		dataSource = getDataSource (dataSource);
 
-		return EVAL_BODY_INCLUDE;
+		return EVAL_BODY_BUFFERED;
 	}
 
 	public int doAfterBody()
@@ -191,7 +191,7 @@ public class ExecuteTag extends BodyTagSupport
 			}
 		}
 
-		return EVAL_PAGE;
+		return SKIP_BODY;
 	}
 
 	public int doEndTag()
